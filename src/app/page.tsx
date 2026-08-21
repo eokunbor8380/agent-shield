@@ -2,6 +2,7 @@ import Link from "next/link";
 import { AppShell } from "@/components/AppShell";
 import { SectionIntro } from "@/components/SectionIntro";
 import { metrics } from "@/data/agentShield";
+import { getSession } from "@/lib/auth";
 
 const promises = [
   "Discover agents and non-human identities across cloud, code, SaaS, and runtime systems.",
@@ -9,7 +10,9 @@ const promises = [
   "Score agent trust, blast radius, and policy risk before risky actions execute.",
 ];
 
-export default function Home() {
+export default async function Home() {
+  const session = await getSession();
+
   return (
     <AppShell>
       <section className="mx-auto grid min-h-[720px] max-w-7xl gap-12 px-6 py-20 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
@@ -20,12 +23,25 @@ export default function Home() {
             description="AgentShield is a security control plane for AI agents and non-human identities, with protected console workflows for inventory, risk, policy, integrations, evidence, and response."
           />
           <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-            <Link className="rounded-md bg-brand px-5 py-3 text-center text-sm font-black text-slate-950 hover:bg-brand-strong" href="/register">
-              Register
-            </Link>
-            <Link className="rounded-md border border-line px-5 py-3 text-center text-sm font-black text-white hover:border-brand" href="/sign-in">
-              Sign in
-            </Link>
+            {session ? (
+              <>
+                <Link className="rounded-md bg-brand px-5 py-3 text-center text-sm font-black text-slate-950 hover:bg-brand-strong" href="/dashboard">
+                  Open dashboard
+                </Link>
+                <Link className="rounded-md border border-line px-5 py-3 text-center text-sm font-black text-white hover:border-brand" href="/settings/users">
+                  Manage users
+                </Link>
+              </>
+            ) : (
+              <>
+                <Link className="rounded-md bg-brand px-5 py-3 text-center text-sm font-black text-slate-950 hover:bg-brand-strong" href="/register">
+                  Register
+                </Link>
+                <Link className="rounded-md border border-line px-5 py-3 text-center text-sm font-black text-white hover:border-brand" href="/sign-in">
+                  Sign in
+                </Link>
+              </>
+            )}
           </div>
         </div>
         <div className="rounded-md border border-line bg-panel p-6">
