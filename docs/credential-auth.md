@@ -10,6 +10,45 @@ AgentShield now has an actual credential flow:
 - Sessions use an HTTP-only cookie
 - Protected pages require a valid session
 
+## Admin Login
+
+The seeded owner email is:
+
+```text
+Email: leeokk80@gmail.com
+Role: Super Admin
+```
+
+For security, the initial password is not stored in code. Set this Vercel environment variable before relying on the seeded owner login:
+
+```text
+AGENTSHIELD_OWNER_INITIAL_PASSWORD=<your-strong-temporary-password>
+```
+
+Optional:
+
+```text
+AGENTSHIELD_OWNER_EMAIL=leeokk80@gmail.com
+```
+
+Without `AGENTSHIELD_OWNER_INITIAL_PASSWORD`, create the first account through `/register`.
+
+## Roles
+
+System roles:
+
+- `Super Admin`: full platform and workspace owner permissions.
+- `Admin`: manage users, roles, integrations, policy, risk, and evidence.
+- `Standard`: operate normal security workflows.
+- `Read-Only`: view console data and export/view evidence.
+- `Custom`: created by Super Admin or Admin users.
+
+Custom roles can be created at:
+
+```text
+/settings/roles
+```
+
 ## Current Storage
 
 User accounts are stored in the current Phase 2/3 local store:

@@ -98,6 +98,7 @@ Phase 6 adds launch readiness:
 /sign-in
 /register
 /settings
+/settings/roles
 /api/health
 ```
 
@@ -119,6 +120,8 @@ POST /api/security/evaluate
 POST /api/security/incident
 GET  /api/evidence/export/nist-csf
 POST /api/auth/register
+GET  /api/roles
+POST /api/roles
 ```
 
 ## Local Development

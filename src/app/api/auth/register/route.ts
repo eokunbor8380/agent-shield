@@ -1,9 +1,9 @@
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
-import { createSessionValue, hashPassword, isStrongEnoughPassword, sessionCookieName } from "@/lib/auth";
+import { createSessionValue, hashPassword, isStrongEnoughPassword, sessionCookieName, shouldUseSecureCookies } from "@/lib/auth";
 import { appendAuditEvent, writeStore } from "@/lib/store";
 
-type RegisteredUser = { id: string; tenantId: string; name: string; email: string; role: "Owner" };
+type RegisteredUser = { id: string; tenantId: string; name: string; email: string; role: "Super Admin" };
 
 export async function POST(request: Request) {
   const form = await request.formData();
@@ -18,7 +18,7 @@ export async function POST(request: Request) {
 
   const tenantId = `tenant-${Date.now()}`;
   const userId = `usr-${Date.now()}`;
-  const createdUser: RegisteredUser = { id: userId, tenantId, name, email, role: "Owner" };
+  const createdUser: RegisteredUser = { id: userId, tenantId, name, email, role: "Super Admin" };
   let alreadyExists = false;
 
   await writeStore((store) => {
@@ -60,7 +60,7 @@ export async function POST(request: Request) {
   cookieStore.set(sessionCookieName, createSessionValue(session), {
     httpOnly: true,
     sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
+    secure: shouldUseSecureCookies(),
     path: "/",
     maxAge: 60 * 60 * 8,
   });

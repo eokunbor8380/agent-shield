@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { AppShell } from "@/components/AppShell";
 import { Panel } from "@/components/Panel";
 import { SectionIntro } from "@/components/SectionIntro";
@@ -56,6 +57,9 @@ export default async function SettingsPage() {
         </div>
         <div className="mt-6 grid gap-6 lg:grid-cols-2">
           <Panel title="Users">
+            <Link href="/settings/roles" className="mb-4 inline-flex rounded-md border border-line px-4 py-2 text-sm font-bold text-white hover:border-brand">
+              Manage roles
+            </Link>
             <div className="grid gap-3">
               {store.users.map((user) => (
                 <div key={user.id} className="rounded-md bg-panel-strong p-4">

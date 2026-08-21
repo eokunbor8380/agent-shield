@@ -7,10 +7,15 @@ export type UserSession = {
   name: string;
   email: string;
   tenantId: string;
-  role: "Owner" | "Admin" | "Analyst";
+  role: string;
 };
 
 export const sessionCookieName = "agentshield_session";
+
+export function shouldUseSecureCookies() {
+  const appBaseUrl = process.env.APP_BASE_URL ?? "";
+  return process.env.NODE_ENV === "production" && appBaseUrl.startsWith("https://");
+}
 
 export function createSessionValue(session: UserSession) {
   return Buffer.from(JSON.stringify(session), "utf8").toString("base64url");
@@ -70,4 +75,8 @@ export function verifyPassword(password: string, storedHash: string | undefined)
 
 export function isStrongEnoughPassword(password: string) {
   return password.length >= 8;
+}
+
+export function canManageRoles(role: string) {
+  return role === "Super Admin" || role === "Admin";
 }

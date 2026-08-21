@@ -15,6 +15,16 @@ create table if not exists users (
   created_at timestamptz not null default now()
 );
 
+create table if not exists roles (
+  id text primary key,
+  tenant_id text not null references tenants(id),
+  name text not null,
+  type text not null,
+  description text not null,
+  permissions jsonb not null,
+  created_at timestamptz not null default now()
+);
+
 create table if not exists agents (
   id text primary key,
   tenant_id text not null references tenants(id),

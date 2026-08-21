@@ -13,6 +13,60 @@ import {
   timeline,
   securityControls,
 } from "@/data/agentShield";
+import { hashPassword } from "@/lib/auth";
+
+export type Permission =
+  | "users:read"
+  | "users:write"
+  | "roles:read"
+  | "roles:write"
+  | "agents:read"
+  | "agents:write"
+  | "risk:read"
+  | "risk:write"
+  | "policy:read"
+  | "policy:write"
+  | "security:read"
+  | "security:write"
+  | "integrations:read"
+  | "integrations:write"
+  | "evidence:read"
+  | "settings:read"
+  | "settings:write";
+
+export type RoleDefinition = {
+  id: string;
+  tenantId: string;
+  name: "Super Admin" | "Admin" | "Standard" | "Read-Only" | string;
+  type: "system" | "custom";
+  description: string;
+  permissions: Permission[];
+  createdAt: string;
+};
+
+export const permissionCatalog: Array<{ id: Permission; label: string; group: string }> = [
+  { id: "users:read", label: "View users", group: "Users" },
+  { id: "users:write", label: "Manage users", group: "Users" },
+  { id: "roles:read", label: "View roles", group: "Roles" },
+  { id: "roles:write", label: "Manage roles", group: "Roles" },
+  { id: "agents:read", label: "View agents", group: "Agents" },
+  { id: "agents:write", label: "Manage agents", group: "Agents" },
+  { id: "risk:read", label: "View risk", group: "Risk" },
+  { id: "risk:write", label: "Manage remediation", group: "Risk" },
+  { id: "policy:read", label: "View policy", group: "Policy" },
+  { id: "policy:write", label: "Manage policy", group: "Policy" },
+  { id: "security:read", label: "View security engine", group: "Security" },
+  { id: "security:write", label: "Run response actions", group: "Security" },
+  { id: "integrations:read", label: "View integrations", group: "Integrations" },
+  { id: "integrations:write", label: "Run integration sync", group: "Integrations" },
+  { id: "evidence:read", label: "View/export evidence", group: "Evidence" },
+  { id: "settings:read", label: "View settings", group: "Settings" },
+  { id: "settings:write", label: "Manage settings", group: "Settings" },
+];
+
+export function requirePermissionList() {
+  return permissionCatalog.map((permission) => permission.id);
+}
 
 export type AuditEvent = {
   id: string;
@@ -34,7 +88,8 @@ export type DemoRequest = {
 
 export type AgentShieldStore = {
   tenants: Array<{ id: string; name: string; plan: "Phase 2 Free Pilot" | "Phase 3 Free SaaS Foundation"; region: string }>;
-  users: Array<{ id: string; tenantId: string; name: string; email: string; role: "Owner" | "Admin" | "Analyst"; passwordHash?: string; createdAt?: string }>;
+  users: Array<{ id: string; tenantId: string; name: string; email: string; role: string; passwordHash?: string; createdAt?: string }>;
+  roles: RoleDefinition[];
   agents: typeof agents;
   findings: typeof findings;
   policies: typeof policies;
@@ -52,13 +107,84 @@ export type AgentShieldStore = {
 
 const runtimeDir = path.join(process.cwd(), ".agent-shield-data");
 const runtimeFile = path.join(runtimeDir, "store.json");
+const ownerEmail = process.env.AGENTSHIELD_OWNER_EMAIL?.toLowerCase() ?? "leeokk80@gmail.com";
+const ownerBootstrapPassword = process.env.AGENTSHIELD_OWNER_INITIAL_PASSWORD;
 
 let memoryStore: AgentShieldStore | null = null;
 
 function createSeedStore(): AgentShieldStore {
+  const createdAt = "2026-08-21T00:00:00.000Z";
+  const allPermissions: Permission[] = [
+    "users:read",
+    "users:write",
+    "roles:read",
+    "roles:write",
+    "agents:read",
+    "agents:write",
+    "risk:read",
+    "risk:write",
+    "policy:read",
+    "policy:write",
+    "security:read",
+    "security:write",
+    "integrations:read",
+    "integrations:write",
+    "evidence:read",
+    "settings:read",
+    "settings:write",
+  ];
+
   return {
     tenants: [{ id: "tenant-demo", name: "AgentShield Demo Workspace", plan: "Phase 3 Free SaaS Foundation", region: "us-east" }],
-    users: [],
+    users: [
+      {
+        id: "usr-super-admin",
+        tenantId: "tenant-demo",
+        name: "Efosa Okunbor",
+        email: ownerEmail,
+        role: "Super Admin",
+        passwordHash: ownerBootstrapPassword ? hashPassword(ownerBootstrapPassword) : undefined,
+        createdAt,
+      },
+    ],
+    roles: [
+      {
+        id: "role-super-admin",
+        tenantId: "tenant-demo",
+        name: "Super Admin",
+        type: "system",
+        description: "Full platform and workspace owner permissions.",
+        permissions: allPermissions,
+        createdAt,
+      },
+      {
+        id: "role-admin",
+        tenantId: "tenant-demo",
+        name: "Admin",
+        type: "system",
+        description: "Manage users, roles, integrations, policy, risk, and evidence.",
+        permissions: allPermissions.filter((permission) => permission !== "settings:write"),
+        createdAt,
+      },
+      {
+        id: "role-standard",
+        tenantId: "tenant-demo",
+        name: "Standard",
+        type: "system",
+        description: "Operate agent, risk, policy, security, and evidence workflows.",
+        permissions: ["agents:read", "agents:write", "risk:read", "risk:write", "policy:read", "security:read", "integrations:read", "evidence:read", "settings:read"],
+        createdAt,
+      },
+      {
+        id: "role-read-only",
+        tenantId: "tenant-demo",
+        name: "Read-Only",
+        type: "system",
+        description: "View console data and evidence without making changes.",
+        permissions: ["users:read", "roles:read", "agents:read", "risk:read", "policy:read", "security:read", "integrations:read", "evidence:read", "settings:read"],
+        createdAt,
+      },
+    ],
     agents,
     findings,
     policies,
@@ -87,6 +213,9 @@ function createSeedStore(): AgentShieldStore {
 function normalizeStore(store: Partial<AgentShieldStore>): AgentShieldStore {
   const seed = createSeedStore();
   const integrationsBySlug = new Map(seed.integrations.map((integration) => [integration.slug, integration]));
+  const storedUsers = store.users ?? [];
+  const users = storedUsers.length ? storedUsers : seed.users;
+  const hasOwner = users.some((user) => user.email.toLowerCase() === ownerEmail);
 
   return {
     ...seed,
@@ -109,10 +238,16 @@ function normalizeStore(store: Partial<AgentShieldStore>): AgentShieldStore {
     connectorRuns: store.connectorRuns ?? seed.connectorRuns,
     environmentChecks: store.environmentChecks ?? seed.environmentChecks,
     securityControls: store.securityControls ?? seed.securityControls,
-    users: (store.users ?? seed.users).map((user) => ({
+    roles: store.roles ?? seed.roles,
+    users: [
+      ...users.map((user) => ({
       ...user,
-      role: user.role === "Admin" || user.role === "Analyst" ? user.role : "Owner",
+      name: user.email.toLowerCase() === ownerEmail ? "Efosa Okunbor" : user.name,
+      role: user.email.toLowerCase() === ownerEmail || user.role === "Owner" || user.role === "Analyst" ? "Super Admin" : user.role,
+      passwordHash: user.email.toLowerCase() === ownerEmail && ownerBootstrapPassword ? seed.users[0].passwordHash : user.passwordHash,
     })),
+      ...(hasOwner ? [] : seed.users),
+    ],
     auditEvents: store.auditEvents ?? seed.auditEvents,
     demoRequests: store.demoRequests ?? seed.demoRequests,
   };
