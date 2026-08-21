@@ -65,6 +65,23 @@ Available actions:
 
 The current implementation stores passwords as hashes. Until Postgres or managed auth is connected, user accounts remain part of the prototype local/memory store.
 
+## Platform Owner Tenant Management
+
+The AgentShield application owner has `platformRole: Owner` and can create customer tenants at:
+
+```text
+/platform/tenants
+```
+
+Each customer tenant gets:
+
+- Its own tenant ID
+- Its own Super Admin owner account
+- Its own system roles
+- Its own user-management area
+
+Customer tenant admins manage their own workspace under `/settings/users` and `/settings/roles`. They do not get access to `/platform/tenants`.
+
 ## Current Storage
 
 User accounts are stored in the current Phase 2/3 local store:

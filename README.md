@@ -100,6 +100,7 @@ Phase 6 adds launch readiness:
 /settings
 /settings/users
 /settings/roles
+/platform/tenants
 /api/health
 ```
 
@@ -127,6 +128,8 @@ GET  /api/users
 POST /api/users
 POST /api/users/:id/role
 POST /api/users/:id/reset-password
+GET  /api/platform/tenants
+POST /api/platform/tenants
 ```
 
 ## Local Development

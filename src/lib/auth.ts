@@ -8,6 +8,7 @@ export type UserSession = {
   email: string;
   tenantId: string;
   role: string;
+  platformRole?: "Owner" | "Member";
 };
 
 export const sessionCookieName = "agentshield_session";
@@ -83,4 +84,8 @@ export function canManageRoles(role: string) {
 
 export function canManageUsers(role: string) {
   return role === "Super Admin" || role === "Admin";
+}
+
+export function isPlatformOwner(session: UserSession | null) {
+  return session?.platformRole === "Owner";
 }

@@ -32,13 +32,14 @@ export async function POST(request: Request) {
       ...store,
       tenants: [
         ...store.tenants,
-        { id: tenantId, name: company || `${name}'s Workspace`, plan: "Phase 3 Free SaaS Foundation", region: "us-east" },
+        { id: tenantId, name: company || `${name}'s Workspace`, plan: "Phase 3 Free SaaS Foundation", region: "us-east", status: "Active", createdAt: new Date().toISOString() },
       ],
       roles: [...store.roles, ...buildSystemRoles(tenantId)],
       users: [
         ...store.users,
         {
           ...createdUser,
+          platformRole: "Member",
           passwordHash: hashPassword(password),
           createdAt: new Date().toISOString(),
         },
@@ -56,6 +57,7 @@ export async function POST(request: Request) {
     email: createdUser.email,
     tenantId: createdUser.tenantId,
     role: createdUser.role,
+    platformRole: "Member" as const,
   };
   const cookieStore = await cookies();
   cookieStore.set(sessionCookieName, createSessionValue(session), {

@@ -3,6 +3,7 @@ create table if not exists tenants (
   name text not null,
   plan text not null,
   region text not null default 'us-east',
+  status text not null default 'Active',
   created_at timestamptz not null default now()
 );
 
@@ -12,6 +13,7 @@ create table if not exists users (
   name text not null,
   email text not null,
   role text not null,
+  platform_role text,
   password_hash text,
   password_reset_at timestamptz,
   created_at timestamptz not null default now()

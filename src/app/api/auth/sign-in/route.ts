@@ -22,6 +22,7 @@ export async function POST(request: Request) {
     email: user.email,
     tenantId: user.tenantId,
     role: user.role,
+    platformRole: user.platformRole,
   };
   const cookieStore = await cookies();
 

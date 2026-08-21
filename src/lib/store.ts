@@ -130,8 +130,8 @@ export type DemoRequest = {
 };
 
 export type AgentShieldStore = {
-  tenants: Array<{ id: string; name: string; plan: "Phase 2 Free Pilot" | "Phase 3 Free SaaS Foundation"; region: string }>;
-  users: Array<{ id: string; tenantId: string; name: string; email: string; role: string; passwordHash?: string; createdAt?: string }>;
+  tenants: Array<{ id: string; name: string; plan: "Phase 2 Free Pilot" | "Phase 3 Free SaaS Foundation"; region: string; status?: "Active" | "Suspended"; createdAt?: string }>;
+  users: Array<{ id: string; tenantId: string; name: string; email: string; role: string; platformRole?: "Owner" | "Member"; passwordHash?: string; createdAt?: string }>;
   roles: RoleDefinition[];
   agents: typeof agents;
   findings: typeof findings;
@@ -159,7 +159,7 @@ function createSeedStore(): AgentShieldStore {
   const createdAt = "2026-08-21T00:00:00.000Z";
 
   return {
-    tenants: [{ id: "tenant-demo", name: "AgentShield Demo Workspace", plan: "Phase 3 Free SaaS Foundation", region: "us-east" }],
+    tenants: [{ id: "tenant-demo", name: "AgentShield Demo Workspace", plan: "Phase 3 Free SaaS Foundation", region: "us-east", status: "Active", createdAt }],
     users: [
       {
         id: "usr-super-admin",
@@ -167,6 +167,7 @@ function createSeedStore(): AgentShieldStore {
         name: "Efosa Okunbor",
         email: ownerEmail,
         role: "Super Admin",
+        platformRole: "Owner",
         passwordHash: ownerBootstrapPassword ? hashPassword(ownerBootstrapPassword) : undefined,
         createdAt,
       },
@@ -240,6 +241,7 @@ function normalizeStore(store: Partial<AgentShieldStore>): AgentShieldStore {
       ...user,
       name: user.email.toLowerCase() === ownerEmail ? "Efosa Okunbor" : user.name,
       role: user.email.toLowerCase() === ownerEmail || user.role === "Owner" || user.role === "Analyst" ? "Super Admin" : user.role,
+      platformRole: user.email.toLowerCase() === ownerEmail ? "Owner" : user.platformRole ?? "Member",
       passwordHash: user.email.toLowerCase() === ownerEmail && ownerBootstrapPassword ? seed.users[0].passwordHash : user.passwordHash,
     })),
       ...(hasOwner ? [] : seed.users),

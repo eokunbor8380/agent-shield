@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getSession } from "@/lib/auth";
+import { getSession, isPlatformOwner } from "@/lib/auth";
 
 const navItems = [
   { label: "Home", href: "/" },
@@ -38,6 +38,11 @@ export async function AppShell({ children }: { children: React.ReactNode }) {
                 {item.label}
               </Link>
             ))}
+            {isPlatformOwner(session) ? (
+              <Link className="hover:text-brand" href="/platform/tenants">
+                Customers
+              </Link>
+            ) : null}
           </nav>
           {session ? (
             <form action="/api/auth/sign-out" method="post" className="hidden sm:block">
