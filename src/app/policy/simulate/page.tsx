@@ -3,9 +3,13 @@ import { AppShell } from "@/components/AppShell";
 import { Panel } from "@/components/Panel";
 import { SectionIntro } from "@/components/SectionIntro";
 import { StatusPill } from "@/components/StatusPill";
-import { getAgentById, policySimulationScenarios } from "@/data/agentShield";
+import { requireSession } from "@/lib/auth";
+import { readStore } from "@/lib/store";
 
-export default function PolicySimulatorPage() {
+export default async function PolicySimulatorPage() {
+  await requireSession();
+  const { agents, policySimulationScenarios } = await readStore();
+
   return (
     <AppShell>
       <section className="mx-auto max-w-7xl px-6 py-12">
@@ -16,7 +20,7 @@ export default function PolicySimulatorPage() {
         />
         <div className="mt-10 grid gap-5">
           {policySimulationScenarios.map((scenario) => {
-            const agent = getAgentById(scenario.agentId);
+            const agent = agents.find((item) => item.id === scenario.agentId) ?? null;
 
             return (
               <Panel key={scenario.id} title={scenario.action}>

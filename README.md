@@ -4,7 +4,7 @@ AgentShield is an enterprise AI agent security control plane. The destination pr
 
 ## Phase 1 Scope
 
-This first implementation is intentionally free/near-free and production-shaped:
+The first implementation is intentionally free/near-free and production-shaped:
 
 - Next.js App Router with TypeScript
 - Tailwind CSS
@@ -20,6 +20,21 @@ This first implementation is intentionally free/near-free and production-shaped:
 - Mock API endpoints for agents, findings, policies, integrations, and evidence
 
 Database, authentication, email delivery, real connectors, event streaming, graph storage, and runtime enforcement are deferred until the UI and data model are stable.
+
+## Phase 2 Scope
+
+Phase 2 adds the first SaaS foundation:
+
+- Demo sign-in and sign-out
+- Protected console routes
+- Protected API routes
+- Tenant-aware demo workspace
+- Local JSON persistence for development
+- Audit activity
+- Writable finding remediation workflow
+- Writable integration connection workflow
+
+This phase still avoids paid infrastructure. Production authentication and durable Postgres storage are planned for the next phase.
 
 ## Phase 1 Routes
 
@@ -37,6 +52,7 @@ Database, authentication, email delivery, real connectors, event streaming, grap
 /compliance
 /compliance/nist-csf
 /contact
+/sign-in
 ```
 
 ## Mock API Routes

@@ -5,6 +5,8 @@ import { MetricCard } from "@/components/MetricCard";
 import { Panel } from "@/components/Panel";
 import { StatusPill } from "@/components/StatusPill";
 import { agents, getAgentById } from "@/data/agentShield";
+import { requireSession } from "@/lib/auth";
+import { readStore } from "@/lib/store";
 
 export function generateStaticParams() {
   return agents.map((agent) => ({ id: agent.id }));
@@ -12,7 +14,9 @@ export function generateStaticParams() {
 
 export async function generateMetadata({ params }: PageProps<"/agents/[id]">) {
   const { id } = await params;
-  const agent = getAgentById(id);
+  await requireSession();
+  const store = await readStore();
+  const agent = store.agents.find((item) => item.id === id) ?? null;
 
   return {
     title: agent ? `${agent.name} | Agent Passport` : "Agent Passport",

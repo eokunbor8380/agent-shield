@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getSession } from "@/lib/auth";
 
 const navItems = [
   { label: "Home", href: "/" },
@@ -11,7 +12,9 @@ const navItems = [
   { label: "Contact", href: "/contact" },
 ];
 
-export function AppShell({ children }: { children: React.ReactNode }) {
+export async function AppShell({ children }: { children: React.ReactNode }) {
+  const session = await getSession();
+
   return (
     <main className="min-h-screen bg-background text-foreground">
       <header className="border-b border-line bg-background/95">
@@ -34,12 +37,20 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               </Link>
             ))}
           </nav>
-          <Link
-            href="/contact"
-            className="hidden rounded-md bg-brand px-4 py-2 text-sm font-black text-slate-950 hover:bg-brand-strong sm:inline-block"
-          >
-            Request demo
-          </Link>
+          {session ? (
+            <form action="/api/auth/sign-out" method="post" className="hidden sm:block">
+              <button className="rounded-md border border-line px-4 py-2 text-sm font-black text-white hover:border-brand" type="submit">
+                Sign out
+              </button>
+            </form>
+          ) : (
+            <Link
+              href="/sign-in"
+              className="hidden rounded-md bg-brand px-4 py-2 text-sm font-black text-slate-950 hover:bg-brand-strong sm:inline-block"
+            >
+              Sign in
+            </Link>
+          )}
         </div>
       </header>
       {children}

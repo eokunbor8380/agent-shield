@@ -1,9 +1,13 @@
 import Link from "next/link";
 import { AppShell } from "@/components/AppShell";
 import { SectionIntro } from "@/components/SectionIntro";
-import { integrations } from "@/data/agentShield";
+import { requireSession } from "@/lib/auth";
+import { readStore } from "@/lib/store";
 
-export default function IntegrationsPage() {
+export default async function IntegrationsPage() {
+  await requireSession();
+  const { integrations } = await readStore();
+
   return (
     <AppShell>
       <section className="mx-auto max-w-7xl px-6 py-12">

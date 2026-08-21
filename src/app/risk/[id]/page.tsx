@@ -3,7 +3,9 @@ import { notFound } from "next/navigation";
 import { AppShell } from "@/components/AppShell";
 import { Panel } from "@/components/Panel";
 import { StatusPill } from "@/components/StatusPill";
-import { findings, getAgentById, getFindingById } from "@/data/agentShield";
+import { findings } from "@/data/agentShield";
+import { requireSession } from "@/lib/auth";
+import { readStore } from "@/lib/store";
 
 export function generateStaticParams() {
   return findings.map((finding) => ({ id: finding.id }));
@@ -11,7 +13,9 @@ export function generateStaticParams() {
 
 export async function generateMetadata({ params }: PageProps<"/risk/[id]">) {
   const { id } = await params;
-  const finding = getFindingById(id);
+  await requireSession();
+  const store = await readStore();
+  const finding = store.findings.find((item) => item.id === id) ?? null;
 
   return {
     title: finding ? `${finding.id} | Risk Finding` : "Risk Finding",
@@ -20,13 +24,15 @@ export async function generateMetadata({ params }: PageProps<"/risk/[id]">) {
 
 export default async function FindingDetailPage({ params }: PageProps<"/risk/[id]">) {
   const { id } = await params;
-  const finding = getFindingById(id);
+  await requireSession();
+  const store = await readStore();
+  const finding = store.findings.find((item) => item.id === id) ?? null;
 
   if (!finding) {
     notFound();
   }
 
-  const agent = finding.entityId ? getAgentById(finding.entityId) : null;
+  const agent = finding.entityId ? store.agents.find((item) => item.id === finding.entityId) ?? null : null;
 
   return (
     <AppShell>
@@ -57,6 +63,12 @@ export default async function FindingDetailPage({ params }: PageProps<"/risk/[id
                 <span className="text-muted">Due</span>
                 <span className="font-bold text-white">{finding.due}</span>
               </p>
+              <form action={`/api/findings/${finding.id}/status`} method="post" className="grid gap-3 pt-3">
+                <input type="hidden" name="status" value="In remediation" />
+                <button className="rounded-md bg-brand px-4 py-3 text-sm font-black text-slate-950 hover:bg-brand-strong" type="submit">
+                  Start remediation
+                </button>
+              </form>
             </div>
           </Panel>
         </div>

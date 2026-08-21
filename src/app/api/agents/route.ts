@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
-import { agents } from "@/data/agentShield";
+import { requireSession } from "@/lib/auth";
+import { readStore } from "@/lib/store";
 
-export function GET() {
+export async function GET() {
+  await requireSession();
+  const { agents } = await readStore();
   return NextResponse.json({ data: agents });
 }

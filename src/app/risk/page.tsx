@@ -2,9 +2,13 @@ import Link from "next/link";
 import { AppShell } from "@/components/AppShell";
 import { SectionIntro } from "@/components/SectionIntro";
 import { StatusPill } from "@/components/StatusPill";
-import { findings } from "@/data/agentShield";
+import { requireSession } from "@/lib/auth";
+import { readStore } from "@/lib/store";
 
-export default function RiskPage() {
+export default async function RiskPage() {
+  await requireSession();
+  const { findings } = await readStore();
+
   return (
     <AppShell>
       <section className="mx-auto max-w-7xl px-6 py-12">

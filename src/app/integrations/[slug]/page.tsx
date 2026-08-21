@@ -3,6 +3,8 @@ import { notFound } from "next/navigation";
 import { AppShell } from "@/components/AppShell";
 import { Panel } from "@/components/Panel";
 import { integrations, getIntegrationBySlug } from "@/data/agentShield";
+import { requireSession } from "@/lib/auth";
+import { readStore } from "@/lib/store";
 
 export function generateStaticParams() {
   return integrations.map((integration) => ({ slug: integration.slug }));
@@ -10,7 +12,9 @@ export function generateStaticParams() {
 
 export async function generateMetadata({ params }: PageProps<"/integrations/[slug]">) {
   const { slug } = await params;
-  const integration = getIntegrationBySlug(slug);
+  await requireSession();
+  const store = await readStore();
+  const integration = store.integrations.find((item) => item.slug === slug) ?? null;
 
   return {
     title: integration ? `${integration.name} | Integration` : "Integration",
@@ -40,6 +44,11 @@ export default async function IntegrationDetailPage({ params }: PageProps<"/inte
           <Panel title="Connector state">
             <p className="text-sm text-muted">Freshness</p>
             <p className="mt-2 text-xl font-black text-white">{integration.freshness}</p>
+            <form action={`/api/integrations/${integration.slug}/connect`} method="post" className="mt-5">
+              <button className="rounded-md bg-brand px-4 py-3 text-sm font-black text-slate-950 hover:bg-brand-strong" type="submit">
+                Mark connected
+              </button>
+            </form>
           </Panel>
         </div>
 

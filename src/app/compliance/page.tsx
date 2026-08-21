@@ -2,9 +2,13 @@ import Link from "next/link";
 import { AppShell } from "@/components/AppShell";
 import { Panel } from "@/components/Panel";
 import { SectionIntro } from "@/components/SectionIntro";
-import { evidenceControls } from "@/data/agentShield";
+import { requireSession } from "@/lib/auth";
+import { readStore } from "@/lib/store";
 
-export default function CompliancePage() {
+export default async function CompliancePage() {
+  await requireSession();
+  const { evidenceControls } = await readStore();
+
   return (
     <AppShell>
       <section className="mx-auto max-w-7xl px-6 py-12">

@@ -4,16 +4,21 @@ import { MetricCard } from "@/components/MetricCard";
 import { Panel } from "@/components/Panel";
 import { SectionIntro } from "@/components/SectionIntro";
 import { StatusPill } from "@/components/StatusPill";
-import { agents, findings, metrics, timeline } from "@/data/agentShield";
+import { requireSession } from "@/lib/auth";
+import { readStore } from "@/lib/store";
 
-export default function DashboardPage() {
+export default async function DashboardPage() {
+  const session = await requireSession();
+  const { agents, findings, metrics, timeline, tenants, auditEvents } = await readStore();
+  const tenant = tenants.find((item) => item.id === session.tenantId);
+
   return (
     <AppShell>
       <section className="mx-auto max-w-7xl px-6 py-12">
         <SectionIntro
           eyebrow="Dashboard"
-          title="Autonomous identity posture at a glance."
-          description="This Phase 1 dashboard uses mock data shaped like the production model from the design documents."
+          title={`${tenant?.name ?? "AgentShield"} posture at a glance.`}
+          description="Phase 2 adds sign-in, tenant-aware records, local persistence, audit activity, and backend-shaped APIs."
         />
         <div className="mt-10 grid gap-4 md:grid-cols-4">
           {metrics.map((metric) => <MetricCard key={metric.label} {...metric} />)}
@@ -55,6 +60,19 @@ export default function DashboardPage() {
                   <p className="font-mono text-sm text-brand">{item.time}</p>
                   <p className="font-semibold text-white">{item.event}</p>
                   <p className="text-sm font-bold text-muted">{item.decision}</p>
+                </div>
+              ))}
+            </div>
+          </Panel>
+        </div>
+        <div className="mt-6">
+          <Panel title="Recent audit activity" description="Actions written by Phase 2 auth and workflow APIs.">
+            <div className="grid gap-3">
+              {auditEvents.slice(0, 4).map((item) => (
+                <div key={item.id} className="grid gap-3 rounded-md bg-panel-strong p-4 md:grid-cols-[110px_1fr_180px]">
+                  <p className="font-mono text-sm text-brand">{item.id}</p>
+                  <p className="font-semibold text-white">{item.action}</p>
+                  <p className="text-sm text-muted">{item.actor}</p>
                 </div>
               ))}
             </div>

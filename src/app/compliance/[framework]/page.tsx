@@ -3,6 +3,8 @@ import { notFound } from "next/navigation";
 import { AppShell } from "@/components/AppShell";
 import { Panel } from "@/components/Panel";
 import { evidenceControls, getEvidenceBySlug } from "@/data/agentShield";
+import { requireSession } from "@/lib/auth";
+import { readStore } from "@/lib/store";
 
 export function generateStaticParams() {
   return evidenceControls.map((control) => ({ framework: control.slug }));
@@ -10,7 +12,9 @@ export function generateStaticParams() {
 
 export async function generateMetadata({ params }: PageProps<"/compliance/[framework]">) {
   const { framework } = await params;
-  const control = getEvidenceBySlug(framework);
+  await requireSession();
+  const store = await readStore();
+  const control = store.evidenceControls.find((item) => item.slug === framework) ?? null;
 
   return {
     title: control ? `${control.framework} | Evidence` : "Compliance Evidence",
