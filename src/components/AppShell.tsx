@@ -4,11 +4,13 @@ import { getSession, isPlatformOwner } from "@/lib/auth";
 const navItems = [
   { label: "Home", href: "/" },
   { label: "Dashboard", href: "/dashboard" },
+  { label: "Onboarding", href: "/onboarding" },
   { label: "Agents", href: "/agents" },
   { label: "Risk", href: "/risk" },
   { label: "Policy", href: "/policy" },
   { label: "Security", href: "/security" },
   { label: "Compliance", href: "/compliance" },
+  { label: "Reports", href: "/reports" },
   { label: "Integrations", href: "/integrations" },
   { label: "Settings", href: "/settings" },
   { label: "Contact", href: "/contact" },

@@ -129,6 +129,28 @@ export type DemoRequest = {
   createdAt: string;
 };
 
+export type TenantIntegrationConfig = {
+  id: string;
+  tenantId: string;
+  integrationSlug: string;
+  status: "Not configured" | "Configured" | "Syncing" | "Error";
+  credentials: Record<string, string>;
+  maskedCredentials: Record<string, string>;
+  lastSyncAt?: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type ReportSnapshot = {
+  id: string;
+  tenantId: string;
+  title: string;
+  summary: string;
+  source: string;
+  metrics: Array<{ label: string; value: string }>;
+  createdAt: string;
+};
+
 export type AgentShieldStore = {
   tenants: Array<{ id: string; name: string; plan: "Phase 2 Free Pilot" | "Phase 3 Free SaaS Foundation"; region: string; status?: "Active" | "Suspended"; createdAt?: string }>;
   users: Array<{ id: string; tenantId: string; name: string; email: string; role: string; platformRole?: "Owner" | "Member"; passwordHash?: string; createdAt?: string }>;
@@ -138,6 +160,8 @@ export type AgentShieldStore = {
   policies: typeof policies;
   policySimulationScenarios: typeof policySimulationScenarios;
   integrations: typeof integrations;
+  tenantIntegrationConfigs: TenantIntegrationConfig[];
+  reportSnapshots: ReportSnapshot[];
   evidenceControls: typeof evidenceControls;
   timeline: typeof timeline;
   metrics: typeof metrics;
@@ -178,6 +202,8 @@ function createSeedStore(): AgentShieldStore {
     policies,
     policySimulationScenarios,
     integrations,
+    tenantIntegrationConfigs: [],
+    reportSnapshots: [],
     evidenceControls,
     timeline,
     metrics,
@@ -232,6 +258,8 @@ function normalizeStore(store: Partial<AgentShieldStore>): AgentShieldStore {
         ? integration.syncMode
         : integrationsBySlug.get(integration.slug)?.syncMode ?? "Demo sync",
     })) as AgentShieldStore["integrations"],
+    tenantIntegrationConfigs: store.tenantIntegrationConfigs ?? seed.tenantIntegrationConfigs,
+    reportSnapshots: store.reportSnapshots ?? seed.reportSnapshots,
     connectorRuns: store.connectorRuns ?? seed.connectorRuns,
     environmentChecks: store.environmentChecks ?? seed.environmentChecks,
     securityControls: store.securityControls ?? seed.securityControls,

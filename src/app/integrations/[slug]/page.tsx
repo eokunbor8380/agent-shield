@@ -3,7 +3,6 @@ import { notFound } from "next/navigation";
 import { AppShell } from "@/components/AppShell";
 import { Panel } from "@/components/Panel";
 import { integrations } from "@/data/agentShield";
-import { getConnectorEnvironmentStatus } from "@/lib/config";
 import { requireSession } from "@/lib/auth";
 import { readStore } from "@/lib/store";
 
@@ -24,7 +23,7 @@ export async function generateMetadata({ params }: PageProps<"/integrations/[slu
 
 export default async function IntegrationDetailPage({ params }: PageProps<"/integrations/[slug]">) {
   const { slug } = await params;
-  await requireSession();
+  const session = await requireSession();
   const store = await readStore();
   const integration = store.integrations.find((item) => item.slug === slug) ?? null;
 
@@ -32,8 +31,12 @@ export default async function IntegrationDetailPage({ params }: PageProps<"/inte
     notFound();
   }
 
-  const envStatus = getConnectorEnvironmentStatus(integration.requiredEnv);
-  const runs = store.connectorRuns.filter((run) => run.integrationSlug === integration.slug);
+  const tenantConfig = store.tenantIntegrationConfigs.find((config) => config.tenantId === session.tenantId && config.integrationSlug === integration.slug);
+  const envStatus = integration.requiredEnv.map((key) => ({
+    key,
+    configured: Boolean(tenantConfig?.credentials[key]) || Boolean(process.env[key]),
+  }));
+  const runs = store.connectorRuns.filter((run) => run.tenantId === session.tenantId && run.integrationSlug === integration.slug);
 
   return (
     <AppShell>
@@ -78,7 +81,7 @@ export default async function IntegrationDetailPage({ params }: PageProps<"/inte
           </Panel>
         </div>
         <div className="mt-6 grid gap-6 lg:grid-cols-2">
-          <Panel title="Required environment variables">
+          <Panel title="Tenant credentials">
             <div className="grid gap-3">
               {envStatus.map((item) => (
                 <div key={item.key} className="grid gap-2 rounded-md bg-panel-strong p-4 md:grid-cols-[1fr_120px]">
@@ -89,6 +92,24 @@ export default async function IntegrationDetailPage({ params }: PageProps<"/inte
                 </div>
               ))}
             </div>
+            {tenantConfig ? (
+              <div className="mt-5 grid gap-2">
+                {Object.entries(tenantConfig.maskedCredentials).map(([key, value]) => (
+                  <p key={key} className="font-mono text-xs text-muted">{key}: {value}</p>
+                ))}
+              </div>
+            ) : null}
+            <form action={`/api/integrations/${integration.slug}/credentials`} method="post" className="mt-5 grid gap-3">
+              {integration.requiredEnv.map((key) => (
+                <label key={key} className="grid gap-2">
+                  <span className="text-sm font-bold text-white">{key}</span>
+                  <input name={key} type={key.includes("SECRET") || key.includes("TOKEN") ? "password" : "text"} className="rounded-md border border-line bg-background px-4 py-3 text-white" />
+                </label>
+              ))}
+              <button className="rounded-md bg-brand px-4 py-3 text-sm font-black text-slate-950 hover:bg-brand-strong" type="submit">
+                Save tenant credentials
+              </button>
+            </form>
           </Panel>
           <Panel title="Recent sync runs">
             <div className="grid gap-3">

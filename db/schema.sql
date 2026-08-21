@@ -90,6 +90,29 @@ create table if not exists connector_runs (
   finished_at timestamptz
 );
 
+create table if not exists tenant_integration_configs (
+  id text primary key,
+  tenant_id text not null references tenants(id),
+  integration_slug text not null,
+  status text not null,
+  credentials jsonb not null,
+  masked_credentials jsonb not null,
+  last_sync_at timestamptz,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  unique (tenant_id, integration_slug)
+);
+
+create table if not exists report_snapshots (
+  id text primary key,
+  tenant_id text not null references tenants(id),
+  title text not null,
+  summary text not null,
+  source text not null,
+  metrics jsonb not null,
+  created_at timestamptz not null default now()
+);
+
 create table if not exists policies (
   id text primary key,
   tenant_id text not null references tenants(id),

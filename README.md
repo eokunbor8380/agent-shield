@@ -54,6 +54,8 @@ Phase 4 adds the first integration layer:
 - Connector run history
 - GitHub live sync when `GITHUB_TOKEN` and `GITHUB_OWNER` are configured
 - Demo fallback sync for connectors without credentials
+- Tenant-specific connector credential setup
+- Connector sync output feeding agent inventory and reports
 
 ## Phase 5 Scope
 
@@ -83,6 +85,7 @@ Phase 6 adds launch readiness:
 ```text
 /
 /dashboard
+/onboarding
 /agents
 /agents/as-agent-fin-0184
 /risk
@@ -94,6 +97,7 @@ Phase 6 adds launch readiness:
 /integrations/github
 /compliance
 /compliance/nist-csf
+/reports
 /contact
 /sign-in
 /register
@@ -112,10 +116,12 @@ GET  /api/agents/as-agent-fin-0184
 GET  /api/findings
 GET  /api/integrations
 GET  /api/evidence
+GET  /api/reports
 GET  /api/policies/simulate
 POST /api/policies/simulate
 POST /api/demo-request
 GET  /api/settings
+POST /api/integrations/github/credentials
 POST /api/integrations/github/sync
 GET  /api/security/posture
 POST /api/security/evaluate
@@ -167,3 +173,5 @@ Both commands must pass before pushing changes.
 ## Architecture Records
 
 Architecture decisions are tracked in `docs/adr`.
+
+Tenant onboarding and reporting operations are documented in `docs/onboarding-and-reporting.md`.
