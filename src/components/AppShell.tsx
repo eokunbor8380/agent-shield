@@ -6,6 +6,7 @@ const navItems = [
   { label: "Agents", href: "/agents" },
   { label: "Risk", href: "/risk" },
   { label: "Policy", href: "/policy" },
+  { label: "Compliance", href: "/compliance" },
   { label: "Integrations", href: "/integrations" },
   { label: "Contact", href: "/contact" },
 ];
@@ -33,6 +34,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               </Link>
             ))}
           </nav>
+          <Link
+            href="/contact"
+            className="hidden rounded-md bg-brand px-4 py-2 text-sm font-black text-slate-950 hover:bg-brand-strong sm:inline-block"
+          >
+            Request demo
+          </Link>
         </div>
       </header>
       {children}

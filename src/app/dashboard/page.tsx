@@ -1,8 +1,10 @@
 import Link from "next/link";
 import { AppShell } from "@/components/AppShell";
+import { MetricCard } from "@/components/MetricCard";
+import { Panel } from "@/components/Panel";
 import { SectionIntro } from "@/components/SectionIntro";
 import { StatusPill } from "@/components/StatusPill";
-import { agents, findings, metrics } from "@/data/agentShield";
+import { agents, findings, metrics, timeline } from "@/data/agentShield";
 
 export default function DashboardPage() {
   return (
@@ -14,17 +16,10 @@ export default function DashboardPage() {
           description="This Phase 1 dashboard uses mock data shaped like the production model from the design documents."
         />
         <div className="mt-10 grid gap-4 md:grid-cols-4">
-          {metrics.map((metric) => (
-            <div key={metric.label} className="rounded-md border border-line bg-panel p-5">
-              <p className="text-sm font-semibold text-muted">{metric.label}</p>
-              <p className="mt-3 text-3xl font-black text-white">{metric.value}</p>
-              <p className="mt-2 text-sm text-brand">{metric.delta}</p>
-            </div>
-          ))}
+          {metrics.map((metric) => <MetricCard key={metric.label} {...metric} />)}
         </div>
         <div className="mt-10 grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
-          <section className="rounded-md border border-line bg-panel p-6">
-            <h2 className="text-xl font-black text-white">High-reach agents</h2>
+          <Panel title="High-reach agents" description="Entities with meaningful tool, data, or credential reach.">
             <div className="mt-5 grid gap-4">
               {agents.slice(0, 3).map((agent) => (
                 <Link key={agent.id} href="/agents" className="grid gap-3 rounded-md bg-panel-strong p-4 hover:outline hover:outline-1 hover:outline-brand md:grid-cols-[1fr_auto]">
@@ -39,9 +34,8 @@ export default function DashboardPage() {
                 </Link>
               ))}
             </div>
-          </section>
-          <section className="rounded-md border border-line bg-panel p-6">
-            <h2 className="text-xl font-black text-white">Top findings</h2>
+          </Panel>
+          <Panel title="Top findings" description="Risk items that need ownership, approval, or remediation.">
             <div className="mt-5 grid gap-4">
               {findings.map((finding) => (
                 <div key={finding.id} className="rounded-md bg-panel-strong p-4">
@@ -51,7 +45,20 @@ export default function DashboardPage() {
                 </div>
               ))}
             </div>
-          </section>
+          </Panel>
+        </div>
+        <div className="mt-6">
+          <Panel title="Authorization timeline" description="Early forensic chain model across policy, gateway, and connector events.">
+            <div className="grid gap-3">
+              {timeline.map((item) => (
+                <div key={`${item.time}-${item.event}`} className="grid gap-3 rounded-md bg-panel-strong p-4 md:grid-cols-[80px_1fr_160px]">
+                  <p className="font-mono text-sm text-brand">{item.time}</p>
+                  <p className="font-semibold text-white">{item.event}</p>
+                  <p className="text-sm font-bold text-muted">{item.decision}</p>
+                </div>
+              ))}
+            </div>
+          </Panel>
         </div>
       </section>
     </AppShell>

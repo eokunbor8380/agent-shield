@@ -14,7 +14,7 @@ export default function RiskPage() {
         />
         <div className="mt-10 overflow-hidden rounded-md border border-line">
           {findings.map((finding) => (
-            <div key={finding.id} className="grid gap-4 border-b border-line bg-panel p-5 last:border-b-0 md:grid-cols-[140px_1fr_180px] md:items-center">
+            <div key={finding.id} className="grid gap-4 border-b border-line bg-panel p-5 last:border-b-0 md:grid-cols-[140px_1fr_160px_120px] md:items-center">
               <StatusPill value={finding.severity} />
               <div>
                 <p className="font-mono text-xs text-brand">{finding.id}</p>
@@ -22,6 +22,10 @@ export default function RiskPage() {
                 <p className="mt-1 text-sm text-muted">{finding.entity}</p>
               </div>
               <p className="text-sm font-semibold text-muted">{finding.status}</p>
+              <div className="text-sm">
+                <p className="font-bold text-white">{finding.owner}</p>
+                <p className="text-muted">{finding.due}</p>
+              </div>
             </div>
           ))}
         </div>
