@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { readSessionValue, sessionCookieName } from "@/lib/auth";
 
 const protectedPrefixes = ["/dashboard", "/agents", "/risk", "/policy", "/security", "/compliance", "/integrations", "/settings"];
-const protectedApiPrefixes = ["/api/agents", "/api/findings", "/api/integrations", "/api/evidence", "/api/policies", "/api/settings", "/api/security", "/api/roles"];
+const protectedApiPrefixes = ["/api/agents", "/api/findings", "/api/integrations", "/api/evidence", "/api/policies", "/api/settings", "/api/security", "/api/roles", "/api/users"];
 
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;

@@ -80,3 +80,7 @@ export function isStrongEnoughPassword(password: string) {
 export function canManageRoles(role: string) {
   return role === "Super Admin" || role === "Admin";
 }
+
+export function canManageUsers(role: string) {
+  return role === "Super Admin" || role === "Admin";
+}

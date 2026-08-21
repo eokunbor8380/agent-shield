@@ -12,6 +12,8 @@ create table if not exists users (
   name text not null,
   email text not null,
   role text not null,
+  password_hash text,
+  password_reset_at timestamptz,
   created_at timestamptz not null default now()
 );
 

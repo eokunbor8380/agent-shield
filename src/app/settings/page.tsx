@@ -57,11 +57,16 @@ export default async function SettingsPage() {
         </div>
         <div className="mt-6 grid gap-6 lg:grid-cols-2">
           <Panel title="Users">
-            <Link href="/settings/roles" className="mb-4 inline-flex rounded-md border border-line px-4 py-2 text-sm font-bold text-white hover:border-brand">
-              Manage roles
-            </Link>
+            <div className="mb-4 flex flex-wrap gap-3">
+              <Link href="/settings/users" className="inline-flex rounded-md border border-line px-4 py-2 text-sm font-bold text-white hover:border-brand">
+                Manage users
+              </Link>
+              <Link href="/settings/roles" className="inline-flex rounded-md border border-line px-4 py-2 text-sm font-bold text-white hover:border-brand">
+                Manage roles
+              </Link>
+            </div>
             <div className="grid gap-3">
-              {store.users.map((user) => (
+              {store.users.filter((user) => user.tenantId === session.tenantId).map((user) => (
                 <div key={user.id} className="rounded-md bg-panel-strong p-4">
                   <p className="font-bold text-white">{user.name}</p>
                   <p className="mt-1 text-sm text-muted">{user.email} | {user.role}</p>

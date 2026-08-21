@@ -49,6 +49,22 @@ Custom roles can be created at:
 /settings/roles
 ```
 
+## User Management
+
+Super Admin and Admin users can manage accounts at:
+
+```text
+/settings/users
+```
+
+Available actions:
+
+- Create a user
+- Assign any system or custom role
+- Reset another user's password
+
+The current implementation stores passwords as hashes. Until Postgres or managed auth is connected, user accounts remain part of the prototype local/memory store.
+
 ## Current Storage
 
 User accounts are stored in the current Phase 2/3 local store:

@@ -68,6 +68,49 @@ export function requirePermissionList() {
   return permissionCatalog.map((permission) => permission.id);
 }
 
+export function buildSystemRoles(tenantId: string, createdAt = new Date().toISOString()): RoleDefinition[] {
+  const allPermissions = requirePermissionList();
+
+  return [
+    {
+      id: `${tenantId}-role-super-admin`,
+      tenantId,
+      name: "Super Admin",
+      type: "system",
+      description: "Full platform and workspace owner permissions.",
+      permissions: allPermissions,
+      createdAt,
+    },
+    {
+      id: `${tenantId}-role-admin`,
+      tenantId,
+      name: "Admin",
+      type: "system",
+      description: "Manage users, roles, integrations, policy, risk, and evidence.",
+      permissions: allPermissions.filter((permission) => permission !== "settings:write"),
+      createdAt,
+    },
+    {
+      id: `${tenantId}-role-standard`,
+      tenantId,
+      name: "Standard",
+      type: "system",
+      description: "Operate agent, risk, policy, security, and evidence workflows.",
+      permissions: ["agents:read", "agents:write", "risk:read", "risk:write", "policy:read", "security:read", "integrations:read", "evidence:read", "settings:read"],
+      createdAt,
+    },
+    {
+      id: `${tenantId}-role-read-only`,
+      tenantId,
+      name: "Read-Only",
+      type: "system",
+      description: "View console data and evidence without making changes.",
+      permissions: ["users:read", "roles:read", "agents:read", "risk:read", "policy:read", "security:read", "integrations:read", "evidence:read", "settings:read"],
+      createdAt,
+    },
+  ];
+}
+
 export type AuditEvent = {
   id: string;
   tenantId: string;
@@ -114,25 +157,6 @@ let memoryStore: AgentShieldStore | null = null;
 
 function createSeedStore(): AgentShieldStore {
   const createdAt = "2026-08-21T00:00:00.000Z";
-  const allPermissions: Permission[] = [
-    "users:read",
-    "users:write",
-    "roles:read",
-    "roles:write",
-    "agents:read",
-    "agents:write",
-    "risk:read",
-    "risk:write",
-    "policy:read",
-    "policy:write",
-    "security:read",
-    "security:write",
-    "integrations:read",
-    "integrations:write",
-    "evidence:read",
-    "settings:read",
-    "settings:write",
-  ];
 
   return {
     tenants: [{ id: "tenant-demo", name: "AgentShield Demo Workspace", plan: "Phase 3 Free SaaS Foundation", region: "us-east" }],
@@ -147,44 +171,7 @@ function createSeedStore(): AgentShieldStore {
         createdAt,
       },
     ],
-    roles: [
-      {
-        id: "role-super-admin",
-        tenantId: "tenant-demo",
-        name: "Super Admin",
-        type: "system",
-        description: "Full platform and workspace owner permissions.",
-        permissions: allPermissions,
-        createdAt,
-      },
-      {
-        id: "role-admin",
-        tenantId: "tenant-demo",
-        name: "Admin",
-        type: "system",
-        description: "Manage users, roles, integrations, policy, risk, and evidence.",
-        permissions: allPermissions.filter((permission) => permission !== "settings:write"),
-        createdAt,
-      },
-      {
-        id: "role-standard",
-        tenantId: "tenant-demo",
-        name: "Standard",
-        type: "system",
-        description: "Operate agent, risk, policy, security, and evidence workflows.",
-        permissions: ["agents:read", "agents:write", "risk:read", "risk:write", "policy:read", "security:read", "integrations:read", "evidence:read", "settings:read"],
-        createdAt,
-      },
-      {
-        id: "role-read-only",
-        tenantId: "tenant-demo",
-        name: "Read-Only",
-        type: "system",
-        description: "View console data and evidence without making changes.",
-        permissions: ["users:read", "roles:read", "agents:read", "risk:read", "policy:read", "security:read", "integrations:read", "evidence:read", "settings:read"],
-        createdAt,
-      },
-    ],
+    roles: buildSystemRoles("tenant-demo", createdAt),
     agents,
     findings,
     policies,
@@ -216,6 +203,15 @@ function normalizeStore(store: Partial<AgentShieldStore>): AgentShieldStore {
   const storedUsers = store.users ?? [];
   const users = storedUsers.length ? storedUsers : seed.users;
   const hasOwner = users.some((user) => user.email.toLowerCase() === ownerEmail);
+  const storedRoles = store.roles ?? [];
+  const roles = store.tenants?.length
+    ? store.tenants.flatMap((tenant) => {
+        const tenantRoles = storedRoles.filter((role) => role.tenantId === tenant.id);
+        const systemRoleNames = new Set(tenantRoles.filter((role) => role.type === "system").map((role) => role.name));
+        const missingSystemRoles = buildSystemRoles(tenant.id, seed.auditEvents[0].createdAt).filter((role) => !systemRoleNames.has(role.name));
+        return [...tenantRoles, ...missingSystemRoles];
+      })
+    : seed.roles;
 
   return {
     ...seed,
@@ -238,7 +234,7 @@ function normalizeStore(store: Partial<AgentShieldStore>): AgentShieldStore {
     connectorRuns: store.connectorRuns ?? seed.connectorRuns,
     environmentChecks: store.environmentChecks ?? seed.environmentChecks,
     securityControls: store.securityControls ?? seed.securityControls,
-    roles: store.roles ?? seed.roles,
+    roles,
     users: [
       ...users.map((user) => ({
       ...user,

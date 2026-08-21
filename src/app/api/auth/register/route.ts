@@ -1,7 +1,7 @@
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { createSessionValue, hashPassword, isStrongEnoughPassword, sessionCookieName, shouldUseSecureCookies } from "@/lib/auth";
-import { appendAuditEvent, writeStore } from "@/lib/store";
+import { appendAuditEvent, buildSystemRoles, writeStore } from "@/lib/store";
 
 type RegisteredUser = { id: string; tenantId: string; name: string; email: string; role: "Super Admin" };
 
@@ -34,6 +34,7 @@ export async function POST(request: Request) {
         ...store.tenants,
         { id: tenantId, name: company || `${name}'s Workspace`, plan: "Phase 3 Free SaaS Foundation", region: "us-east" },
       ],
+      roles: [...store.roles, ...buildSystemRoles(tenantId)],
       users: [
         ...store.users,
         {
