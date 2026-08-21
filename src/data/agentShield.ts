@@ -159,3 +159,7 @@ export const evidenceControls = [
   { framework: "ISO 27001", control: "Privileged access and access review evidence", status: "Draft" },
   { framework: "SOC 2", control: "Change, access, and monitoring evidence", status: "Mapped" },
 ];
+
+export function getAgentById(id: string) {
+  return agents.find((agent) => agent.id === id) ?? null;
+}

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { AppShell } from "@/components/AppShell";
 import { Panel } from "@/components/Panel";
 import { SectionIntro } from "@/components/SectionIntro";
@@ -19,10 +20,19 @@ export default function AgentsPage() {
               <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
                 <div>
                   <p className="font-mono text-sm text-brand">{agent.id}</p>
-                  <h2 className="mt-2 text-2xl font-black text-white">{agent.name}</h2>
+                  <h2 className="mt-2 text-2xl font-black text-white">
+                    <Link href={`/agents/${agent.id}`} className="hover:text-brand">
+                      {agent.name}
+                    </Link>
+                  </h2>
                   <p className="mt-2 text-muted">{agent.type} | {agent.owner} | {agent.environment} | {agent.assurance}</p>
                 </div>
-                <StatusPill value={agent.status} />
+                <div className="flex flex-wrap items-center gap-3">
+                  <StatusPill value={agent.status} />
+                  <Link href={`/agents/${agent.id}`} className="rounded-md border border-line px-3 py-2 text-sm font-bold text-white hover:border-brand">
+                    Open passport
+                  </Link>
+                </div>
               </div>
               <div className="mt-6 grid gap-4 md:grid-cols-4">
                 <div className="rounded-md bg-panel-strong p-4">

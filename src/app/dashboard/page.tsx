@@ -22,7 +22,7 @@ export default function DashboardPage() {
           <Panel title="High-reach agents" description="Entities with meaningful tool, data, or credential reach.">
             <div className="mt-5 grid gap-4">
               {agents.slice(0, 3).map((agent) => (
-                <Link key={agent.id} href="/agents" className="grid gap-3 rounded-md bg-panel-strong p-4 hover:outline hover:outline-1 hover:outline-brand md:grid-cols-[1fr_auto]">
+                <Link key={agent.id} href={`/agents/${agent.id}`} className="grid gap-3 rounded-md bg-panel-strong p-4 hover:outline hover:outline-1 hover:outline-brand md:grid-cols-[1fr_auto]">
                   <div>
                     <p className="font-bold text-white">{agent.name}</p>
                     <p className="mt-1 text-sm text-muted">{agent.owner} | {agent.environment}</p>
