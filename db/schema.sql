@@ -103,6 +103,36 @@ create table if not exists audit_events (
   created_at timestamptz not null default now()
 );
 
+create table if not exists security_controls (
+  id text primary key,
+  tenant_id text not null references tenants(id),
+  name text not null,
+  description text not null,
+  framework text not null,
+  created_at timestamptz not null default now()
+);
+
+create table if not exists policy_evaluations (
+  id text primary key,
+  tenant_id text not null references tenants(id),
+  scenario_id text not null,
+  agent_id text not null,
+  action text not null,
+  decision text not null,
+  reasons jsonb not null,
+  matched_policies jsonb not null,
+  created_at timestamptz not null default now()
+);
+
+create table if not exists evidence_exports (
+  id text primary key,
+  tenant_id text not null references tenants(id),
+  framework_slug text not null,
+  package jsonb not null,
+  exported_by text not null,
+  exported_at timestamptz not null default now()
+);
+
 create table if not exists demo_requests (
   id text primary key,
   tenant_id text not null references tenants(id),

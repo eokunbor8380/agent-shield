@@ -55,6 +55,18 @@ Phase 4 adds the first integration layer:
 - GitHub live sync when `GITHUB_TOKEN` and `GITHUB_OWNER` are configured
 - Demo fallback sync for connectors without credentials
 
+## Phase 5 Scope
+
+Phase 5 adds the first security engine:
+
+- `/security` posture page
+- Dynamic agent risk scoring
+- Policy evaluation using current state
+- Control checks
+- Incident response quarantine/restore actions
+- JSON evidence exports
+- Security engine APIs
+
 ## Phase 1 Routes
 
 ```text
@@ -66,6 +78,7 @@ Phase 4 adds the first integration layer:
 /risk/AS-FND-1014
 /policy
 /policy/simulate
+/security
 /integrations
 /integrations/github
 /compliance
@@ -88,6 +101,10 @@ POST /api/policies/simulate
 POST /api/demo-request
 GET  /api/settings
 POST /api/integrations/github/sync
+GET  /api/security/posture
+POST /api/security/evaluate
+POST /api/security/incident
+GET  /api/evidence/export/nist-csf
 ```
 
 ## Local Development

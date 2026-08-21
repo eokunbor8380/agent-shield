@@ -11,6 +11,7 @@ import {
   policies,
   policySimulationScenarios,
   timeline,
+  securityControls,
 } from "@/data/agentShield";
 
 export type AuditEvent = {
@@ -44,6 +45,7 @@ export type AgentShieldStore = {
   metrics: typeof metrics;
   connectorRuns: typeof connectorRuns;
   environmentChecks: typeof environmentChecks;
+  securityControls: typeof securityControls;
   auditEvents: AuditEvent[];
   demoRequests: DemoRequest[];
 };
@@ -67,6 +69,7 @@ function createSeedStore(): AgentShieldStore {
     metrics,
     connectorRuns,
     environmentChecks,
+    securityControls,
     auditEvents: [
       {
         id: "AUD-0001",
@@ -105,6 +108,7 @@ function normalizeStore(store: Partial<AgentShieldStore>): AgentShieldStore {
     })) as AgentShieldStore["integrations"],
     connectorRuns: store.connectorRuns ?? seed.connectorRuns,
     environmentChecks: store.environmentChecks ?? seed.environmentChecks,
+    securityControls: store.securityControls ?? seed.securityControls,
     auditEvents: store.auditEvents ?? seed.auditEvents,
     demoRequests: store.demoRequests ?? seed.demoRequests,
   };

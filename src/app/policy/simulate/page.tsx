@@ -4,11 +4,12 @@ import { Panel } from "@/components/Panel";
 import { SectionIntro } from "@/components/SectionIntro";
 import { StatusPill } from "@/components/StatusPill";
 import { requireSession } from "@/lib/auth";
+import { evaluatePolicyScenario } from "@/lib/securityEngine";
 import { readStore } from "@/lib/store";
 
 export default async function PolicySimulatorPage() {
   await requireSession();
-  const { agents, policySimulationScenarios } = await readStore();
+  const store = await readStore();
 
   return (
     <AppShell>
@@ -16,20 +17,21 @@ export default async function PolicySimulatorPage() {
         <SectionIntro
           eyebrow="Policy simulator"
           title="Preview access decisions before agents act."
-          description="Phase 1 uses deterministic scenarios. Later this becomes the safety test bench for policy bundles, approvals, and runtime gateway enforcement."
+          description="Phase 5 evaluates deterministic scenarios against current agent state, findings, quarantine controls, and policy matches."
         />
         <div className="mt-10 grid gap-5">
-          {policySimulationScenarios.map((scenario) => {
-            const agent = agents.find((item) => item.id === scenario.agentId) ?? null;
+          {store.policySimulationScenarios.map((scenario) => {
+            const evaluation = evaluatePolicyScenario(scenario, store);
+            const agent = store.agents.find((item) => item.id === scenario.agentId) ?? null;
 
             return (
               <Panel key={scenario.id} title={scenario.action}>
                 <div className="grid gap-5 lg:grid-cols-[140px_1fr_220px] lg:items-start">
-                  <StatusPill value={scenario.decision.toLowerCase()} />
+                  <StatusPill value={evaluation.decision.toLowerCase()} />
                   <div>
-                    <p className="leading-7 text-muted">{scenario.reason}</p>
+                    <p className="leading-7 text-muted">{evaluation.reasons.join(" ")}</p>
                     <p className="mt-4 text-sm font-semibold text-white">
-                      Matched policies: {scenario.matchedPolicies.join(", ")}
+                      Matched policies: {evaluation.matchedPolicies.join(", ")}
                     </p>
                   </div>
                   {agent ? (

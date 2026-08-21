@@ -2,8 +2,9 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { AppShell } from "@/components/AppShell";
 import { Panel } from "@/components/Panel";
-import { evidenceControls, getEvidenceBySlug } from "@/data/agentShield";
+import { evidenceControls } from "@/data/agentShield";
 import { requireSession } from "@/lib/auth";
+import { buildEvidenceExport } from "@/lib/securityEngine";
 import { readStore } from "@/lib/store";
 
 export function generateStaticParams() {
@@ -23,11 +24,14 @@ export async function generateMetadata({ params }: PageProps<"/compliance/[frame
 
 export default async function ComplianceDetailPage({ params }: PageProps<"/compliance/[framework]">) {
   const { framework } = await params;
-  const control = getEvidenceBySlug(framework);
+  await requireSession();
+  const store = await readStore();
+  const control = store.evidenceControls.find((item) => item.slug === framework) ?? null;
 
   if (!control) {
     notFound();
   }
+  const evidencePackage = buildEvidenceExport(store, framework);
 
   return (
     <AppShell>
@@ -47,11 +51,17 @@ export default async function ComplianceDetailPage({ params }: PageProps<"/compl
                 <li key={item} className="rounded-md bg-panel-strong px-3 py-2">{item}</li>
               ))}
             </ul>
+            <a
+              href={`/api/evidence/export/${control.slug}`}
+              className="mt-5 inline-flex rounded-md bg-brand px-4 py-3 text-sm font-black text-slate-950 hover:bg-brand-strong"
+            >
+              Export JSON evidence
+            </a>
           </Panel>
-          <Panel title="Next production step">
+          <Panel title="Package summary">
             <p className="leading-7 text-muted">
-              Phase 2 will persist evidence events in a database, attach export timestamps, and prepare auditor-ready
-              packages without adding paid compliance tooling at the start.
+              This export includes {evidencePackage.auditEvents.length} audit events, {evidencePackage.connectorRuns.length} connector runs,
+              {evidencePackage.findings.length} findings, and current posture metrics.
             </p>
           </Panel>
         </div>

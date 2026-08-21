@@ -4,8 +4,9 @@ import { AppShell } from "@/components/AppShell";
 import { MetricCard } from "@/components/MetricCard";
 import { Panel } from "@/components/Panel";
 import { StatusPill } from "@/components/StatusPill";
-import { agents, getAgentById } from "@/data/agentShield";
+import { agents } from "@/data/agentShield";
 import { requireSession } from "@/lib/auth";
+import { scoreAgent } from "@/lib/securityEngine";
 import { readStore } from "@/lib/store";
 
 export function generateStaticParams() {
@@ -25,11 +26,14 @@ export async function generateMetadata({ params }: PageProps<"/agents/[id]">) {
 
 export default async function AgentPassportPage({ params }: PageProps<"/agents/[id]">) {
   const { id } = await params;
-  const agent = getAgentById(id);
+  await requireSession();
+  const store = await readStore();
+  const agent = store.agents.find((item) => item.id === id) ?? null;
 
   if (!agent) {
     notFound();
   }
+  const engineScore = scoreAgent(agent, store.findings);
 
   return (
     <AppShell>
@@ -65,6 +69,13 @@ export default async function AgentPassportPage({ params }: PageProps<"/agents/[
                 <span className="text-muted">Last seen</span>
                 <span className="font-bold text-white">{agent.lastSeen}</span>
               </p>
+              <form action="/api/security/incident" method="post" className="grid gap-3 pt-3">
+                <input type="hidden" name="agentId" value={agent.id} />
+                <input type="hidden" name="action" value={agent.status === "quarantined" ? "restore" : "quarantine"} />
+                <button className="rounded-md bg-danger px-4 py-3 text-sm font-black text-white hover:opacity-90" type="submit">
+                  {agent.status === "quarantined" ? "Restore to review" : "Quarantine agent"}
+                </button>
+              </form>
             </div>
           </Panel>
         </div>
@@ -72,7 +83,7 @@ export default async function AgentPassportPage({ params }: PageProps<"/agents/[
         <div className="mt-10 grid gap-4 md:grid-cols-3">
           <MetricCard label="AgentTrust" value={String(agent.trustScore)} delta="Explainable trust score" />
           <MetricCard label="Risk score" value={String(agent.riskScore)} delta="Current exposure level" />
-          <MetricCard label="Reach" value={String(agent.tools.length)} delta={`${agent.data}`} />
+          <MetricCard label="Engine score" value={String(engineScore.score)} delta={`${engineScore.band} risk band`} />
         </div>
 
         <div className="mt-10 grid gap-6 lg:grid-cols-3">

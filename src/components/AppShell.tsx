@@ -7,6 +7,7 @@ const navItems = [
   { label: "Agents", href: "/agents" },
   { label: "Risk", href: "/risk" },
   { label: "Policy", href: "/policy" },
+  { label: "Security", href: "/security" },
   { label: "Compliance", href: "/compliance" },
   { label: "Integrations", href: "/integrations" },
   { label: "Settings", href: "/settings" },

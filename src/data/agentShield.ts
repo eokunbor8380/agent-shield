@@ -3,6 +3,7 @@ export type Severity = "critical" | "high" | "medium" | "low";
 export type IntegrationStatus = "Connected" | "Demo-ready" | "Planned" | "Needs setup";
 export type SimulationDecision = "Allow" | "Challenge" | "Deny";
 export type ConnectorKind = "github" | "microsoft-entra" | "aws-iam" | "kubernetes";
+export type ControlStatus = "Passing" | "Needs review" | "Failing";
 
 export const metrics = [
   { label: "Agents discovered", value: "1,248", delta: "+18 this week" },
@@ -226,6 +227,33 @@ export const environmentChecks = [
   { key: "AZURE_TENANT_ID", purpose: "Microsoft Entra tenant identifier", requiredFor: "Phase 4 Entra live sync" },
   { key: "AZURE_CLIENT_ID", purpose: "Read-only Entra app registration client id", requiredFor: "Phase 4 Entra live sync" },
   { key: "AZURE_CLIENT_SECRET", purpose: "Read-only Entra app registration secret", requiredFor: "Phase 4 Entra live sync" },
+];
+
+export const securityControls = [
+  {
+    id: "CTRL-OWNERSHIP",
+    name: "Every privileged agent has an owner",
+    description: "Privileged autonomous identities must map to a business or technical owner.",
+    framework: "NIST CSF GV.OC",
+  },
+  {
+    id: "CTRL-EXPORT-APPROVAL",
+    name: "Sensitive exports require human approval",
+    description: "Agents exporting sensitive records above threshold must be challenged before runtime access.",
+    framework: "ISO 27001 A.5.15",
+  },
+  {
+    id: "CTRL-ASSURANCE",
+    name: "Unverified agents cannot reach production data",
+    description: "Low-assurance or quarantined agents must be denied production routes.",
+    framework: "SOC 2 CC6",
+  },
+  {
+    id: "CTRL-EVIDENCE",
+    name: "Authorization decisions produce evidence",
+    description: "Policy decisions, connector syncs, and response actions must create audit evidence.",
+    framework: "COBIT DSS05",
+  },
 ];
 
 export const timeline = [
