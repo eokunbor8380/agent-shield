@@ -9,6 +9,7 @@ const navItems = [
   { label: "Policy", href: "/policy" },
   { label: "Compliance", href: "/compliance" },
   { label: "Integrations", href: "/integrations" },
+  { label: "Settings", href: "/settings" },
   { label: "Contact", href: "/contact" },
 ];
 

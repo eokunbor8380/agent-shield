@@ -36,6 +36,25 @@ Phase 2 adds the first SaaS foundation:
 
 This phase still avoids paid infrastructure. Production authentication and durable Postgres storage are planned for the next phase.
 
+## Phase 3 and 4 Scope
+
+Phase 3 adds production-readiness foundations:
+
+- Settings page
+- Tenant and user visibility
+- Runtime mode detection
+- Environment readiness checks
+- Postgres-ready schema in `db/schema.sql`
+- Protected settings API
+
+Phase 4 adds the first integration layer:
+
+- Connector metadata
+- Connector required environment checks
+- Connector run history
+- GitHub live sync when `GITHUB_TOKEN` and `GITHUB_OWNER` are configured
+- Demo fallback sync for connectors without credentials
+
 ## Phase 1 Routes
 
 ```text
@@ -53,6 +72,7 @@ This phase still avoids paid infrastructure. Production authentication and durab
 /compliance/nist-csf
 /contact
 /sign-in
+/settings
 ```
 
 ## Mock API Routes
@@ -66,6 +86,8 @@ GET  /api/evidence
 GET  /api/policies/simulate
 POST /api/policies/simulate
 POST /api/demo-request
+GET  /api/settings
+POST /api/integrations/github/sync
 ```
 
 ## Local Development

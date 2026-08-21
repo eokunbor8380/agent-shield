@@ -2,6 +2,7 @@ export type AgentStatus = "active" | "review" | "quarantined";
 export type Severity = "critical" | "high" | "medium" | "low";
 export type IntegrationStatus = "Connected" | "Demo-ready" | "Planned" | "Needs setup";
 export type SimulationDecision = "Allow" | "Challenge" | "Deny";
+export type ConnectorKind = "github" | "microsoft-entra" | "aws-iam" | "kubernetes";
 
 export const metrics = [
   { label: "Agents discovered", value: "1,248", delta: "+18 this week" },
@@ -159,36 +160,72 @@ export const policies = [
 export const integrations = [
   {
     slug: "microsoft-entra-azure",
+    kind: "microsoft-entra" as ConnectorKind,
     name: "Microsoft Entra / Azure",
     status: "Planned" as IntegrationStatus,
     scope: "Service principals, managed identities, roles",
     freshness: "Not connected",
     setup: ["Register read-only enterprise app", "Grant directory and role inventory permissions", "Map service principals to Agent Passport records"],
+    requiredEnv: ["AZURE_TENANT_ID", "AZURE_CLIENT_ID", "AZURE_CLIENT_SECRET"],
+    syncMode: "Credential-ready placeholder",
   },
   {
     slug: "aws-iam",
+    kind: "aws-iam" as ConnectorKind,
     name: "AWS IAM",
     status: "Planned" as IntegrationStatus,
     scope: "Roles, policies, access keys, workload identities",
     freshness: "Not connected",
     setup: ["Create read-only cross-account role", "Sync IAM roles and policy documents", "Detect stale keys and overbroad trust policies"],
+    requiredEnv: ["AWS_ROLE_ARN", "AWS_EXTERNAL_ID"],
+    syncMode: "Credential-ready placeholder",
   },
   {
     slug: "github",
+    kind: "github" as ConnectorKind,
     name: "GitHub",
     status: "Demo-ready" as IntegrationStatus,
     scope: "Apps, bots, repos, actions permissions",
     freshness: "Mock sync: 9 minutes ago",
     setup: ["Install GitHub App in selected org", "Sync apps, bots, and workflow permissions", "Map release automation to owners and repos"],
+    requiredEnv: ["GITHUB_TOKEN", "GITHUB_OWNER"],
+    syncMode: "Live when GitHub env vars are configured; demo fallback otherwise",
   },
   {
     slug: "kubernetes",
+    kind: "kubernetes" as ConnectorKind,
     name: "Kubernetes",
     status: "Planned" as IntegrationStatus,
     scope: "Service accounts, workloads, namespaces",
     freshness: "Not connected",
     setup: ["Install read-only cluster collector", "Sync service accounts and workloads", "Associate runtime workloads with agent identities"],
+    requiredEnv: ["KUBERNETES_API_URL", "KUBERNETES_SERVICE_ACCOUNT_TOKEN"],
+    syncMode: "Credential-ready placeholder",
   },
+];
+
+export const connectorRuns = [
+  {
+    id: "RUN-0001",
+    tenantId: "tenant-demo",
+    integrationSlug: "github",
+    status: "Succeeded",
+    source: "demo",
+    summary: "Seeded GitHub release bot, repository scope, and workflow permission evidence.",
+    startedAt: "2026-08-21T00:00:00.000Z",
+    finishedAt: "2026-08-21T00:00:02.000Z",
+  },
+];
+
+export const environmentChecks = [
+  { key: "APP_BASE_URL", purpose: "Public app URL for redirects and email links", requiredFor: "Phase 3 production" },
+  { key: "AUTH_PROVIDER", purpose: "Future provider switch: demo, clerk, supabase, or authjs", requiredFor: "Phase 3 production" },
+  { key: "DATABASE_URL", purpose: "Future Neon or Supabase Postgres connection string", requiredFor: "Phase 3 production" },
+  { key: "GITHUB_TOKEN", purpose: "Read-only GitHub connector token", requiredFor: "Phase 4 GitHub live sync" },
+  { key: "GITHUB_OWNER", purpose: "GitHub organization or username to inventory", requiredFor: "Phase 4 GitHub live sync" },
+  { key: "AZURE_TENANT_ID", purpose: "Microsoft Entra tenant identifier", requiredFor: "Phase 4 Entra live sync" },
+  { key: "AZURE_CLIENT_ID", purpose: "Read-only Entra app registration client id", requiredFor: "Phase 4 Entra live sync" },
+  { key: "AZURE_CLIENT_SECRET", purpose: "Read-only Entra app registration secret", requiredFor: "Phase 4 Entra live sync" },
 ];
 
 export const timeline = [

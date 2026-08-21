@@ -2,7 +2,9 @@ import { mkdir, readFile, writeFile } from "fs/promises";
 import path from "path";
 import {
   agents,
+  connectorRuns,
   evidenceControls,
+  environmentChecks,
   findings,
   integrations,
   metrics,
@@ -30,7 +32,7 @@ export type DemoRequest = {
 };
 
 export type AgentShieldStore = {
-  tenants: Array<{ id: string; name: string; plan: "Phase 2 Free Pilot" }>;
+  tenants: Array<{ id: string; name: string; plan: "Phase 2 Free Pilot" | "Phase 3 Free SaaS Foundation"; region: string }>;
   users: Array<{ id: string; tenantId: string; name: string; email: string; role: string }>;
   agents: typeof agents;
   findings: typeof findings;
@@ -40,6 +42,8 @@ export type AgentShieldStore = {
   evidenceControls: typeof evidenceControls;
   timeline: typeof timeline;
   metrics: typeof metrics;
+  connectorRuns: typeof connectorRuns;
+  environmentChecks: typeof environmentChecks;
   auditEvents: AuditEvent[];
   demoRequests: DemoRequest[];
 };
@@ -51,7 +55,7 @@ let memoryStore: AgentShieldStore | null = null;
 
 function createSeedStore(): AgentShieldStore {
   return {
-    tenants: [{ id: "tenant-demo", name: "AgentShield Demo Workspace", plan: "Phase 2 Free Pilot" }],
+    tenants: [{ id: "tenant-demo", name: "AgentShield Demo Workspace", plan: "Phase 3 Free SaaS Foundation", region: "us-east" }],
     users: [{ id: "usr-demo-owner", tenantId: "tenant-demo", name: "AgentShield Demo Admin", email: "leeokk80@gmail.com", role: "Owner" }],
     agents,
     findings,
@@ -61,6 +65,8 @@ function createSeedStore(): AgentShieldStore {
     evidenceControls,
     timeline,
     metrics,
+    connectorRuns,
+    environmentChecks,
     auditEvents: [
       {
         id: "AUD-0001",
@@ -72,6 +78,35 @@ function createSeedStore(): AgentShieldStore {
       },
     ],
     demoRequests: [],
+  };
+}
+
+function normalizeStore(store: Partial<AgentShieldStore>): AgentShieldStore {
+  const seed = createSeedStore();
+  const integrationsBySlug = new Map(seed.integrations.map((integration) => [integration.slug, integration]));
+
+  return {
+    ...seed,
+    ...store,
+    tenants: (store.tenants ?? seed.tenants).map((tenant) => ({
+      ...tenant,
+      plan: tenant.plan ?? "Phase 3 Free SaaS Foundation",
+      region: "region" in tenant && typeof tenant.region === "string" ? tenant.region : "us-east",
+    })) as AgentShieldStore["tenants"],
+    integrations: (store.integrations ?? seed.integrations).map((integration) => ({
+      ...(integrationsBySlug.get(integration.slug) ?? integration),
+      ...integration,
+      requiredEnv: "requiredEnv" in integration && Array.isArray(integration.requiredEnv)
+        ? integration.requiredEnv
+        : integrationsBySlug.get(integration.slug)?.requiredEnv ?? [],
+      syncMode: "syncMode" in integration && typeof integration.syncMode === "string"
+        ? integration.syncMode
+        : integrationsBySlug.get(integration.slug)?.syncMode ?? "Demo sync",
+    })) as AgentShieldStore["integrations"],
+    connectorRuns: store.connectorRuns ?? seed.connectorRuns,
+    environmentChecks: store.environmentChecks ?? seed.environmentChecks,
+    auditEvents: store.auditEvents ?? seed.auditEvents,
+    demoRequests: store.demoRequests ?? seed.demoRequests,
   };
 }
 
@@ -88,12 +123,13 @@ async function persistStore(store: AgentShieldStore) {
 
 export async function readStore(): Promise<AgentShieldStore> {
   if (memoryStore) {
+    memoryStore = normalizeStore(memoryStore);
     return memoryStore;
   }
 
   try {
     const raw = await readFile(runtimeFile, "utf8");
-    memoryStore = JSON.parse(raw) as AgentShieldStore;
+    memoryStore = normalizeStore(JSON.parse(raw) as Partial<AgentShieldStore>);
     return memoryStore;
   } catch {
     const seed = createSeedStore();
