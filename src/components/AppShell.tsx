@@ -56,6 +56,16 @@ export async function AppShell({ children }: { children: React.ReactNode }) {
         </div>
       </header>
       {children}
+      <footer className="border-t border-line bg-background">
+        <div className="mx-auto flex max-w-7xl flex-col gap-3 px-6 py-8 text-sm text-muted md:flex-row md:items-center md:justify-between">
+          <p>AgentShield protects autonomous identities, policy decisions, and evidence trails.</p>
+          <div className="flex flex-wrap gap-4 font-semibold">
+            <Link href="/security" className="hover:text-brand">Security</Link>
+            <Link href="/compliance" className="hover:text-brand">Evidence</Link>
+            <Link href="/contact" className="hover:text-brand">Contact</Link>
+          </div>
+        </div>
+      </footer>
     </main>
   );
 }

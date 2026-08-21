@@ -67,6 +67,17 @@ Phase 5 adds the first security engine:
 - JSON evidence exports
 - Security engine APIs
 
+## Phase 6 Scope
+
+Phase 6 adds launch readiness:
+
+- Production metadata
+- Sitemap, robots, and web manifest
+- Health endpoint
+- Security headers
+- Not-found and error pages
+- Launch checklist
+
 ## Phase 1 Routes
 
 ```text
@@ -86,6 +97,7 @@ Phase 5 adds the first security engine:
 /contact
 /sign-in
 /settings
+/api/health
 ```
 
 ## Mock API Routes

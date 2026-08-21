@@ -17,7 +17,7 @@ export default function Home() {
           <SectionIntro
             eyebrow="Enterprise AI agent security"
             title="Identity, authorization, and runtime control for autonomous software."
-            description="AgentShield is a security control plane for AI agents and non-human identities. Phase 1 starts with a deployable console foundation, mock inventory, risk views, policies, and integrations."
+            description="AgentShield is a security control plane for AI agents and non-human identities, with protected console workflows for inventory, risk, policy, integrations, evidence, and response."
           />
           <div className="mt-9 flex flex-col gap-3 sm:flex-row">
             <Link className="rounded-md bg-brand px-5 py-3 text-center text-sm font-black text-slate-950 hover:bg-brand-strong" href="/dashboard">
