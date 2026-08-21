@@ -1,6 +1,7 @@
 export type AgentStatus = "active" | "review" | "quarantined";
 export type Severity = "critical" | "high" | "medium" | "low";
 export type IntegrationStatus = "Connected" | "Demo-ready" | "Planned" | "Needs setup";
+export type SimulationDecision = "Allow" | "Challenge" | "Deny";
 
 export const metrics = [
   { label: "Agents discovered", value: "1,248", delta: "+18 this week" },
@@ -101,6 +102,10 @@ export const findings = [
     status: "Open",
     owner: "IAM Engineering",
     due: "Today",
+    entityId: null,
+    impact: "A service principal with broad data access has no accountable business or technical owner.",
+    evidence: ["No owner in identity metadata", "Privileged data export role attached", "No access review in 90 days"],
+    remediation: ["Assign business owner", "Reduce permissions to approved scopes", "Schedule quarterly access review"],
   },
   {
     id: "AS-FND-1014",
@@ -110,6 +115,10 @@ export const findings = [
     status: "Approval required",
     owner: "Finance Operations",
     due: "2 days",
+    entityId: "as-agent-fin-0184",
+    impact: "The agent can export sensitive customer records beyond the approved threshold without a human challenge.",
+    evidence: ["Salesforce export scope present", "Sensitive record threshold exceeded in simulation", "Policy bundle returned Challenge"],
+    remediation: ["Enable human approval gate", "Lower export scope", "Attach data-purpose binding to passport"],
   },
   {
     id: "AS-FND-1022",
@@ -119,21 +128,28 @@ export const findings = [
     status: "Review scheduled",
     owner: "Platform Engineering",
     due: "7 days",
+    entityId: "as-nhi-dev-0971",
+    impact: "A release bot keeps production repository access even when recent activity does not justify the scope.",
+    evidence: ["Dormant permission path detected", "Repository write scope still attached", "Token rotation due in 21 days"],
+    remediation: ["Confirm current release ownership", "Remove unused repository grants", "Rotate deployment token"],
   },
 ];
 
 export const policies = [
   {
+    id: "sensitive-export-approval",
     name: "Sensitive export approval",
     decision: "Challenge",
     rule: "Require human approval when agent export exceeds 500 sensitive records.",
   },
   {
+    id: "unverified-agent-denial",
     name: "Unverified agent denial",
     decision: "Deny",
     rule: "Block privileged actions when identity assurance is below required tier.",
   },
   {
+    id: "production-jit-grant",
     name: "Production JIT grant",
     decision: "Allow with TTL",
     rule: "Issue scoped 10-minute grant only after policy and owner checks pass.",
@@ -141,10 +157,38 @@ export const policies = [
 ];
 
 export const integrations = [
-  { name: "Microsoft Entra / Azure", status: "Planned" as IntegrationStatus, scope: "Service principals, managed identities, roles", freshness: "Not connected" },
-  { name: "AWS IAM", status: "Planned" as IntegrationStatus, scope: "Roles, policies, access keys, workload identities", freshness: "Not connected" },
-  { name: "GitHub", status: "Demo-ready" as IntegrationStatus, scope: "Apps, bots, repos, actions permissions", freshness: "Mock sync: 9 minutes ago" },
-  { name: "Kubernetes", status: "Planned" as IntegrationStatus, scope: "Service accounts, workloads, namespaces", freshness: "Not connected" },
+  {
+    slug: "microsoft-entra-azure",
+    name: "Microsoft Entra / Azure",
+    status: "Planned" as IntegrationStatus,
+    scope: "Service principals, managed identities, roles",
+    freshness: "Not connected",
+    setup: ["Register read-only enterprise app", "Grant directory and role inventory permissions", "Map service principals to Agent Passport records"],
+  },
+  {
+    slug: "aws-iam",
+    name: "AWS IAM",
+    status: "Planned" as IntegrationStatus,
+    scope: "Roles, policies, access keys, workload identities",
+    freshness: "Not connected",
+    setup: ["Create read-only cross-account role", "Sync IAM roles and policy documents", "Detect stale keys and overbroad trust policies"],
+  },
+  {
+    slug: "github",
+    name: "GitHub",
+    status: "Demo-ready" as IntegrationStatus,
+    scope: "Apps, bots, repos, actions permissions",
+    freshness: "Mock sync: 9 minutes ago",
+    setup: ["Install GitHub App in selected org", "Sync apps, bots, and workflow permissions", "Map release automation to owners and repos"],
+  },
+  {
+    slug: "kubernetes",
+    name: "Kubernetes",
+    status: "Planned" as IntegrationStatus,
+    scope: "Service accounts, workloads, namespaces",
+    freshness: "Not connected",
+    setup: ["Install read-only cluster collector", "Sync service accounts and workloads", "Associate runtime workloads with agent identities"],
+  },
 ];
 
 export const timeline = [
@@ -155,11 +199,72 @@ export const timeline = [
 ];
 
 export const evidenceControls = [
-  { framework: "NIST CSF", control: "Govern and identify autonomous access paths", status: "Mapped" },
-  { framework: "ISO 27001", control: "Privileged access and access review evidence", status: "Draft" },
-  { framework: "SOC 2", control: "Change, access, and monitoring evidence", status: "Mapped" },
+  {
+    slug: "nist-csf",
+    framework: "NIST CSF",
+    control: "Govern and identify autonomous access paths",
+    status: "Mapped",
+    evidence: ["Agent inventory export", "Owner attestation trail", "Policy decision log"],
+  },
+  {
+    slug: "iso-27001",
+    framework: "ISO 27001",
+    control: "Privileged access and access review evidence",
+    status: "Draft",
+    evidence: ["Privileged identity list", "Access review queue", "Remediation history"],
+  },
+  {
+    slug: "soc-2",
+    framework: "SOC 2",
+    control: "Change, access, and monitoring evidence",
+    status: "Mapped",
+    evidence: ["Release bot passport", "Authorization timeline", "Monitoring event sample"],
+  },
+];
+
+export const policySimulationScenarios = [
+  {
+    id: "finance-export",
+    agentId: "as-agent-fin-0184",
+    action: "Export 750 sensitive customer records from Salesforce",
+    decision: "Challenge" as SimulationDecision,
+    reason: "Sensitive export exceeds the approved 500-record threshold and requires Finance Operations approval.",
+    matchedPolicies: ["Sensitive export approval", "Production JIT grant"],
+  },
+  {
+    id: "mcp-production-route",
+    agentId: "as-agent-mcp-0028",
+    action: "Open production PostgreSQL route through MCP Gateway",
+    decision: "Deny" as SimulationDecision,
+    reason: "The MCP client is quarantined and has unverified assurance.",
+    matchedPolicies: ["Unverified agent denial"],
+  },
+  {
+    id: "soc-ticket",
+    agentId: "as-agent-sec-0042",
+    action: "Create incident ticket with SIEM alert summary",
+    decision: "Allow" as SimulationDecision,
+    reason: "The agent is verified, the action is non-destructive, and the scope is telemetry-only.",
+    matchedPolicies: ["Production JIT grant"],
+  },
 ];
 
 export function getAgentById(id: string) {
   return agents.find((agent) => agent.id === id) ?? null;
+}
+
+export function getFindingById(id: string) {
+  return findings.find((finding) => finding.id === id) ?? null;
+}
+
+export function getIntegrationBySlug(slug: string) {
+  return integrations.find((integration) => integration.slug === slug) ?? null;
+}
+
+export function getEvidenceBySlug(slug: string) {
+  return evidenceControls.find((control) => control.slug === slug) ?? null;
+}
+
+export function getSimulationById(id: string) {
+  return policySimulationScenarios.find((scenario) => scenario.id === id) ?? policySimulationScenarios[0];
 }

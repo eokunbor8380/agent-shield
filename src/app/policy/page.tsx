@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { AppShell } from "@/components/AppShell";
 import { SectionIntro } from "@/components/SectionIntro";
 import { policies } from "@/data/agentShield";
@@ -11,6 +12,11 @@ export default function PolicyPage() {
           title="Deny-by-default decisions with explainable outcomes."
           description="The production policy platform will support versioning, simulation, approval gates, rollback, and signed bundles. Phase 1 shows the operating model."
         />
+        <div className="mt-8">
+          <Link href="/policy/simulate" className="inline-flex rounded-md bg-brand px-5 py-3 text-sm font-black text-slate-950 hover:bg-brand-strong">
+            Open policy simulator
+          </Link>
+        </div>
         <div className="mt-10 grid gap-5 md:grid-cols-3">
           {policies.map((policy) => (
             <article key={policy.name} className="rounded-md border border-line bg-panel p-6">

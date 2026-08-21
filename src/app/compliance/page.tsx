@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { AppShell } from "@/components/AppShell";
 import { Panel } from "@/components/Panel";
 import { SectionIntro } from "@/components/SectionIntro";
@@ -14,7 +15,8 @@ export default function CompliancePage() {
         />
         <div className="mt-10 grid gap-5">
           {evidenceControls.map((item) => (
-            <Panel key={`${item.framework}-${item.control}`} title={item.framework}>
+            <Link key={`${item.framework}-${item.control}`} href={`/compliance/${item.slug}`}>
+            <Panel title={item.framework}>
               <div className="grid gap-4 md:grid-cols-[1fr_160px] md:items-center">
                 <p className="text-lg font-semibold leading-8 text-white">{item.control}</p>
                 <span className="rounded-full bg-brand/10 px-3 py-1 text-center text-xs font-black uppercase tracking-wide text-brand">
@@ -22,6 +24,7 @@ export default function CompliancePage() {
                 </span>
               </div>
             </Panel>
+            </Link>
           ))}
         </div>
       </section>

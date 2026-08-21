@@ -38,11 +38,11 @@ export default function DashboardPage() {
           <Panel title="Top findings" description="Risk items that need ownership, approval, or remediation.">
             <div className="mt-5 grid gap-4">
               {findings.map((finding) => (
-                <div key={finding.id} className="rounded-md bg-panel-strong p-4">
+                <Link key={finding.id} href={`/risk/${finding.id}`} className="rounded-md bg-panel-strong p-4 hover:outline hover:outline-1 hover:outline-brand">
                   <StatusPill value={finding.severity} />
                   <p className="mt-3 font-bold text-white">{finding.title}</p>
                   <p className="mt-1 text-sm text-muted">{finding.entity}</p>
-                </div>
+                </Link>
               ))}
             </div>
           </Panel>

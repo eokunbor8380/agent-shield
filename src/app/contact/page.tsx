@@ -8,9 +8,9 @@ export default function ContactPage() {
         <SectionIntro
           eyebrow="Demo request"
           title="Start with a focused AgentShield walkthrough."
-          description="This no-cost Phase 1 form opens a prepared email. Later, we can add Resend free-tier backend delivery."
+          description="This no-cost Phase 1 form routes through an AgentShield API endpoint and opens a prepared email. Later, we can add Resend free-tier backend delivery."
         />
-        <form action="mailto:leeokk80@gmail.com" method="post" encType="text/plain" className="grid gap-5 rounded-md border border-line bg-panel p-6">
+        <form action="/api/demo-request" method="post" className="grid gap-5 rounded-md border border-line bg-panel p-6">
           <label className="grid gap-2">
             <span className="font-bold text-white">Name</span>
             <input name="name" required className="rounded-md border border-line bg-background px-4 py-3 text-white" />
