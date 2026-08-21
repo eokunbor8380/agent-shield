@@ -47,10 +47,10 @@ export async function AppShell({ children }: { children: React.ReactNode }) {
             </form>
           ) : (
             <Link
-              href="/sign-in"
+              href="/register"
               className="hidden rounded-md bg-brand px-4 py-2 text-sm font-black text-slate-950 hover:bg-brand-strong sm:inline-block"
             >
-              Sign in
+              Register
             </Link>
           )}
         </div>

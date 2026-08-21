@@ -34,7 +34,7 @@ export type DemoRequest = {
 
 export type AgentShieldStore = {
   tenants: Array<{ id: string; name: string; plan: "Phase 2 Free Pilot" | "Phase 3 Free SaaS Foundation"; region: string }>;
-  users: Array<{ id: string; tenantId: string; name: string; email: string; role: string }>;
+  users: Array<{ id: string; tenantId: string; name: string; email: string; role: "Owner" | "Admin" | "Analyst"; passwordHash?: string; createdAt?: string }>;
   agents: typeof agents;
   findings: typeof findings;
   policies: typeof policies;
@@ -58,7 +58,7 @@ let memoryStore: AgentShieldStore | null = null;
 function createSeedStore(): AgentShieldStore {
   return {
     tenants: [{ id: "tenant-demo", name: "AgentShield Demo Workspace", plan: "Phase 3 Free SaaS Foundation", region: "us-east" }],
-    users: [{ id: "usr-demo-owner", tenantId: "tenant-demo", name: "AgentShield Demo Admin", email: "leeokk80@gmail.com", role: "Owner" }],
+    users: [],
     agents,
     findings,
     policies,
@@ -109,6 +109,10 @@ function normalizeStore(store: Partial<AgentShieldStore>): AgentShieldStore {
     connectorRuns: store.connectorRuns ?? seed.connectorRuns,
     environmentChecks: store.environmentChecks ?? seed.environmentChecks,
     securityControls: store.securityControls ?? seed.securityControls,
+    users: (store.users ?? seed.users).map((user) => ({
+      ...user,
+      role: user.role === "Admin" || user.role === "Analyst" ? user.role : "Owner",
+    })),
     auditEvents: store.auditEvents ?? seed.auditEvents,
     demoRequests: store.demoRequests ?? seed.demoRequests,
   };

@@ -96,6 +96,7 @@ Phase 6 adds launch readiness:
 /compliance/nist-csf
 /contact
 /sign-in
+/register
 /settings
 /api/health
 ```
@@ -117,6 +118,7 @@ GET  /api/security/posture
 POST /api/security/evaluate
 POST /api/security/incident
 GET  /api/evidence/export/nist-csf
+POST /api/auth/register
 ```
 
 ## Local Development

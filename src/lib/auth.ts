@@ -1,7 +1,8 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { randomBytes, scryptSync, timingSafeEqual } from "crypto";
 
-export type DemoSession = {
+export type UserSession = {
   userId: string;
   name: string;
   email: string;
@@ -9,28 +10,20 @@ export type DemoSession = {
   role: "Owner" | "Admin" | "Analyst";
 };
 
-export const sessionCookieName = "agentshield_demo_session";
+export const sessionCookieName = "agentshield_session";
 
-const demoSession: DemoSession = {
-  userId: "usr-demo-owner",
-  name: "AgentShield Demo Admin",
-  email: "leeokk80@gmail.com",
-  tenantId: "tenant-demo",
-  role: "Owner",
-};
-
-export function createSessionValue(session: DemoSession = demoSession) {
+export function createSessionValue(session: UserSession) {
   return Buffer.from(JSON.stringify(session), "utf8").toString("base64url");
 }
 
-export function readSessionValue(value: string | undefined): DemoSession | null {
+export function readSessionValue(value: string | undefined): UserSession | null {
   if (!value) {
     return null;
   }
 
   try {
     const decoded = Buffer.from(value, "base64url").toString("utf8");
-    const session = JSON.parse(decoded) as DemoSession;
+    const session = JSON.parse(decoded) as UserSession;
 
     if (!session.userId || !session.tenantId || !session.email) {
       return null;
@@ -57,6 +50,24 @@ export async function requireSession() {
   return session;
 }
 
-export function getDemoSession() {
-  return demoSession;
+export function hashPassword(password: string) {
+  const salt = randomBytes(16).toString("hex");
+  const hash = scryptSync(password, salt, 64).toString("hex");
+  return `${salt}:${hash}`;
+}
+
+export function verifyPassword(password: string, storedHash: string | undefined) {
+  if (!storedHash || !storedHash.includes(":")) {
+    return false;
+  }
+
+  const [salt, hash] = storedHash.split(":");
+  const candidate = scryptSync(password, salt, 64);
+  const expected = Buffer.from(hash, "hex");
+
+  return expected.length === candidate.length && timingSafeEqual(expected, candidate);
+}
+
+export function isStrongEnoughPassword(password: string) {
+  return password.length >= 8;
 }
