@@ -49,21 +49,21 @@ export default async function RiskPage() {
 
               {group.findings.length ? (
                 <div className="overflow-x-auto rounded-md border border-line bg-panel">
-                  <table className="min-w-[1180px] w-full border-collapse text-left text-sm">
-                    <thead className="bg-panel-strong text-xs font-black uppercase tracking-[0.12em] text-muted">
+                  <table className="min-w-[1240px] w-full border-collapse text-left text-xs">
+                    <thead className="bg-panel-strong text-[10px] font-black uppercase tracking-[0.12em] text-muted">
                       <tr>
-                        <th className="px-4 py-3">Severity</th>
-                        <th className="px-4 py-3">Risk ID</th>
-                        <th className="px-4 py-3">Agent / entity</th>
-                        <th className="px-4 py-3">Risk title</th>
-                        <th className="px-4 py-3">Status</th>
-                        <th className="px-4 py-3">Owner</th>
-                        <th className="px-4 py-3">Detected</th>
-                        <th className="px-4 py-3">Last seen</th>
-                        <th className="px-4 py-3">Due</th>
-                        <th className="px-4 py-3">Impact</th>
-                        <th className="px-4 py-3">Recommended fix</th>
-                        <th className="px-4 py-3">Action</th>
+                        <th className="px-3 py-2">Severity</th>
+                        <th className="px-3 py-2">Risk ID</th>
+                        <th className="px-3 py-2">Agent / entity</th>
+                        <th className="px-3 py-2">Risk title</th>
+                        <th className="px-3 py-2">Status</th>
+                        <th className="px-3 py-2">Owner</th>
+                        <th className="px-3 py-2">Detected</th>
+                        <th className="px-3 py-2">Last seen</th>
+                        <th className="px-3 py-2">Due</th>
+                        <th className="px-3 py-2">Impact</th>
+                        <th className="px-3 py-2">Recommended fix</th>
+                        <th className="px-3 py-2">Action</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -72,22 +72,22 @@ export default async function RiskPage() {
 
                         return (
                           <tr key={finding.id} className="border-t border-line align-top">
-                            <td className="px-4 py-4"><StatusPill value={finding.severity} /></td>
-                            <td className="px-4 py-4 font-mono text-xs text-brand">{finding.id}</td>
-                            <td className="px-4 py-4">
-                              <p className="font-bold text-white">{finding.entity}</p>
-                              <p className="mt-1 text-xs text-muted">{agent ? agent.type : "External identity"}</p>
+                            <td className="px-3 py-3"><StatusPill value={finding.severity} /></td>
+                            <td className="px-3 py-3 font-mono text-[11px] text-brand">{finding.id}</td>
+                            <td className="px-3 py-3">
+                              <p className="font-bold leading-5 text-white">{finding.entity}</p>
+                              <p className="mt-1 text-[11px] text-muted">{agent ? agent.type : "External identity"}</p>
                             </td>
-                            <td className="px-4 py-4 font-bold text-white">{finding.title}</td>
-                            <td className="px-4 py-4 font-semibold text-muted">{finding.status}</td>
-                            <td className="px-4 py-4 font-semibold text-white">{finding.owner}</td>
-                            <td className="px-4 py-4 text-muted">{detectedDate(index)}</td>
-                            <td className="px-4 py-4 text-muted">{agent?.lastSeen ?? "Unknown"}</td>
-                            <td className="px-4 py-4 text-muted">{finding.due}</td>
-                            <td className="max-w-[260px] px-4 py-4 leading-6 text-muted">{finding.impact}</td>
-                            <td className="max-w-[260px] px-4 py-4 leading-6 text-muted">{finding.remediation[0]}</td>
-                            <td className="px-4 py-4">
-                              <Link href={`/risk/${finding.id}`} className="whitespace-nowrap rounded-md border border-line px-3 py-2 text-xs font-black text-white hover:border-brand">
+                            <td className="max-w-[220px] px-3 py-3 font-bold leading-5 text-white">{finding.title}</td>
+                            <td className="px-3 py-3 font-semibold text-muted">{finding.status}</td>
+                            <td className="px-3 py-3 font-semibold text-white">{finding.owner}</td>
+                            <td className="px-3 py-3 text-muted">{detectedDate(index)}</td>
+                            <td className="px-3 py-3 text-muted">{agent?.lastSeen ?? "Unknown"}</td>
+                            <td className="px-3 py-3 text-muted">{finding.due}</td>
+                            <td className="max-w-[230px] px-3 py-3 leading-5 text-muted">{finding.impact}</td>
+                            <td className="max-w-[220px] px-3 py-3 leading-5 text-muted">{finding.remediation[0]}</td>
+                            <td className="px-3 py-3">
+                              <Link href={`/risk/${finding.id}`} className="whitespace-nowrap rounded-md border border-line px-2 py-1.5 text-[11px] font-black text-white hover:border-brand">
                                 Open
                               </Link>
                             </td>
