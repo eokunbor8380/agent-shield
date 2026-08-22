@@ -39,6 +39,8 @@ body {
 }
 
 .app-background {
+  position: relative;
+  isolation: isolate;
   background:
     linear-gradient(180deg, rgba(7, 17, 31, 0.84), rgba(7, 17, 31, 0.96) 42%, rgba(4, 10, 20, 1)),
     linear-gradient(125deg, rgba(94, 234, 212, 0.12), transparent 28%, rgba(139, 92, 246, 0.11) 72%, transparent),
@@ -57,9 +59,11 @@ body {
   inset: 0;
   pointer-events: none;
   background:
+    url("/agent-shield-tech-background.svg") center 24px / min(1500px, 118vw) auto no-repeat,
     linear-gradient(90deg, transparent, rgba(94, 234, 212, 0.08), transparent) 50% 0 / 1px 100% no-repeat,
     linear-gradient(180deg, transparent, rgba(94, 234, 212, 0.06), transparent) 0 34% / 100% 1px no-repeat;
-  opacity: 0.75;
+  opacity: 0.62;
+  z-index: 0;
 }
 
 .app-background > * {
@@ -68,6 +72,8 @@ body {
 }
 
 .agent-grid-background {
+  position: relative;
+  isolation: isolate;
   background:
     linear-gradient(115deg, rgba(7, 17, 31, 0.92), rgba(7, 17, 31, 0.68) 48%, rgba(8, 13, 27, 0.94)),
     linear-gradient(150deg, rgba(94, 234, 212, 0.16), transparent 34%, rgba(139, 92, 246, 0.1) 68%, transparent),
@@ -76,6 +82,21 @@ body {
     linear-gradient(90deg, rgba(94, 234, 212, 0.08) 1px, transparent 1px),
     #07111f;
   background-size: auto, auto, auto, 72px 72px, 72px 72px, auto;
+}
+
+.agent-grid-background::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: url("/agent-shield-tech-background.svg") center / min(1480px, 122vw) auto no-repeat;
+  opacity: 0.5;
+  z-index: 0;
+}
+
+.agent-grid-background > * {
+  position: relative;
+  z-index: 1;
 }
 
 .agent-signal-panel {
