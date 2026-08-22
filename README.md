@@ -19,7 +19,7 @@ The first implementation is intentionally free/near-free and production-shaped:
 - Compliance evidence mappings and evidence detail pages
 - Contact/demo request page through a local API route
 - Mock API endpoints for agents, findings, policies, integrations, and evidence
-- Report library with CSV, Excel-compatible, and PDF downloads
+- Agentic security report library with CSV, Excel-compatible, and PDF downloads
 
 Database, authentication, email delivery, real connectors, event streaming, graph storage, and runtime enforcement are deferred until the UI and data model are stable.
 

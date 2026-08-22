@@ -88,7 +88,20 @@ export default async function ReportsPage() {
                 />
               </label>
               <div className="grid gap-3">
-                {["Agents", "High-risk agents", "Findings", "Policies", "Connector runs", "Compliance evidence", "Audit events"].map((section) => (
+                {[
+                  "Agent registry",
+                  "Shadow agent gaps",
+                  "Ownership accountability",
+                  "Least privilege access",
+                  "Human over-permissioning",
+                  "Autonomy and lifecycle",
+                  "Policy decisions",
+                  "Runtime evidence",
+                  "Connector coverage",
+                  "Compliance evidence",
+                  "Release readiness",
+                  "Audit events",
+                ].map((section) => (
                   <label key={section} className="flex items-center gap-3 rounded-md border border-line bg-panel-strong p-3 text-sm font-semibold text-muted">
                     <input name="sections" value={section} type="checkbox" className="h-4 w-4 accent-brand" />
                     {section}
