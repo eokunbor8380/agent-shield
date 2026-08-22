@@ -117,9 +117,20 @@ create table if not exists policies (
   id text primary key,
   tenant_id text not null references tenants(id),
   name text not null,
+  category text not null default 'Baseline',
+  pack text not null default 'Required Baseline',
   decision text not null,
+  enforcement_mode text not null default 'Monitor',
+  risk_tier text not null default 'High',
   rule text not null,
-  created_at timestamptz not null default now()
+  business_value text not null default '',
+  configuration jsonb not null default '[]'::jsonb,
+  evidence jsonb not null default '[]'::jsonb,
+  frameworks jsonb not null default '[]'::jsonb,
+  status text not null default 'Active',
+  source text not null default 'standard',
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
 );
 
 create table if not exists evidence_controls (

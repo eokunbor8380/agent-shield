@@ -14,6 +14,7 @@ The first implementation is intentionally free/near-free and production-shaped:
 - Agent inventory and Agent Passport detail pages
 - Risk center and finding detail pages
 - Policy center and policy simulator
+- Policy library with required baseline policies, AgentShield signature policies, and custom packs
 - Integrations catalog and setup checklist pages
 - Compliance evidence mappings and evidence detail pages
 - Contact/demo request page through a local API route
@@ -33,6 +34,7 @@ Phase 2 adds the first SaaS foundation:
 - Audit activity
 - Writable finding remediation workflow
 - Writable integration connection workflow
+- Tenant policy activation, deactivation, and cloning workflows
 
 This phase still avoids paid infrastructure. Production authentication and durable Postgres storage are planned for the next phase.
 
@@ -118,6 +120,8 @@ GET  /api/integrations
 GET  /api/evidence
 GET  /api/reports
 GET  /api/policies/simulate
+GET  /api/policies
+POST /api/policies
 POST /api/policies/simulate
 POST /api/demo-request
 GET  /api/settings

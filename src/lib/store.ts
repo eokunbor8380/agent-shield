@@ -8,12 +8,12 @@ import {
   findings,
   integrations,
   metrics,
-  policies,
   policySimulationScenarios,
   timeline,
   securityControls,
 } from "@/data/agentShield";
 import { hashPassword } from "@/lib/auth";
+import { buildTenantPolicy, getPolicyTemplate, type TenantPolicy } from "@/lib/policyLibrary";
 
 export type Permission =
   | "users:read"
@@ -157,7 +157,7 @@ export type AgentShieldStore = {
   roles: RoleDefinition[];
   agents: typeof agents;
   findings: typeof findings;
-  policies: typeof policies;
+  policies: TenantPolicy[];
   policySimulationScenarios: typeof policySimulationScenarios;
   integrations: typeof integrations;
   tenantIntegrationConfigs: TenantIntegrationConfig[];
@@ -181,6 +181,26 @@ let memoryStore: AgentShieldStore | null = null;
 
 function createSeedStore(): AgentShieldStore {
   const createdAt = "2026-08-21T00:00:00.000Z";
+  const seedPolicies = [
+    "agent-registration-required",
+    "human-owner-sponsor-required",
+    "agent-passport-required",
+    "least-privilege-required",
+    "time-bound-credential-required",
+    "audit-evidence-required",
+    "purpose-bound-access",
+    "intent-mismatch-detection",
+    "autonomy-level-enforcement",
+    "delegated-user-risk-inheritance",
+    "agent-chain-control",
+    "toxic-permission-combination",
+    "blast-radius-expansion",
+    "shadow-agent-quarantine",
+    "high-impact-action-challenge",
+    "data-boundary-enforcement",
+    "agent-kill-switch",
+    "real-time-decision-trace",
+  ];
 
   return {
     tenants: [{ id: "tenant-demo", name: "AgentShield Demo Workspace", plan: "Phase 3 Free SaaS Foundation", region: "us-east", status: "Active", createdAt }],
@@ -199,7 +219,12 @@ function createSeedStore(): AgentShieldStore {
     roles: buildSystemRoles("tenant-demo", createdAt),
     agents,
     findings,
-    policies,
+    policies: seedPolicies
+      .map((policyId) => {
+        const template = getPolicyTemplate(policyId);
+        return template ? buildTenantPolicy(template, "tenant-demo", "Active") : null;
+      })
+      .filter((policy): policy is TenantPolicy => Boolean(policy)),
     policySimulationScenarios,
     integrations,
     tenantIntegrationConfigs: [],
@@ -239,6 +264,32 @@ function normalizeStore(store: Partial<AgentShieldStore>): AgentShieldStore {
         return [...tenantRoles, ...missingSystemRoles];
       })
     : seed.roles;
+  const storedPolicies = (store.policies ?? []) as Array<Partial<TenantPolicy> & { id: string; name: string; decision: string; rule: string }>;
+  const normalizedPolicies = storedPolicies.length
+    ? storedPolicies.map((policy) => ({
+        category: "Baseline",
+        pack: "Legacy",
+        enforcementMode: policy.decision === "Deny" ? "Block" : policy.decision === "Challenge" ? "Challenge" : "Monitor",
+        riskTier: "High",
+        businessValue: policy.rule,
+        configuration: [],
+        evidence: [],
+        frameworks: [],
+        tenantId: "tenantId" in policy && typeof policy.tenantId === "string" ? policy.tenantId : "tenant-demo",
+        status: "status" in policy && typeof policy.status === "string" ? policy.status : "Active",
+        source: "source" in policy && typeof policy.source === "string" ? policy.source : "standard",
+        createdAt: "createdAt" in policy && typeof policy.createdAt === "string" ? policy.createdAt : seed.auditEvents[0].createdAt,
+        updatedAt: "updatedAt" in policy && typeof policy.updatedAt === "string" ? policy.updatedAt : seed.auditEvents[0].createdAt,
+        ...policy,
+      })) as TenantPolicy[]
+    : seed.policies;
+  const policyKeys = new Set(normalizedPolicies.map((policy) => `${policy.tenantId}:${policy.name}`));
+  const requiredPoliciesForTenants = (store.tenants ?? seed.tenants).flatMap((tenant) =>
+    seed.policies
+      .filter((policy) => policy.tenantId === "tenant-demo")
+      .map((policy) => ({ ...policy, id: `${tenant.id}-${policy.id.replace(/^tenant-demo-/, "")}`, tenantId: tenant.id }))
+      .filter((policy) => !policyKeys.has(`${policy.tenantId}:${policy.name}`)),
+  );
 
   return {
     ...seed,
@@ -258,6 +309,7 @@ function normalizeStore(store: Partial<AgentShieldStore>): AgentShieldStore {
         ? integration.syncMode
         : integrationsBySlug.get(integration.slug)?.syncMode ?? "Demo sync",
     })) as AgentShieldStore["integrations"],
+    policies: [...normalizedPolicies, ...requiredPoliciesForTenants],
     tenantIntegrationConfigs: store.tenantIntegrationConfigs ?? seed.tenantIntegrationConfigs,
     reportSnapshots: store.reportSnapshots ?? seed.reportSnapshots,
     connectorRuns: store.connectorRuns ?? seed.connectorRuns,
