@@ -21,7 +21,10 @@ export default async function AgentsPage() {
         />
         <div className="mt-10 grid gap-5">
           {agents.map((agent) => (
-            <article key={agent.id} className="rounded-md border border-line bg-panel p-6">
+            <article key={agent.id} className="relative rounded-md border border-line bg-panel p-6 pr-6 lg:pr-56">
+              <div className="absolute right-6 top-6 hidden lg:block">
+                <RiskGauge score={agent.riskScore} size="md" showDetails={false} />
+              </div>
               <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
                 <div>
                   <p className="font-mono text-sm text-brand">{agent.id}</p>
@@ -39,13 +42,17 @@ export default async function AgentsPage() {
                   </Link>
                 </div>
               </div>
-              <div className="mt-6 grid gap-4 lg:grid-cols-[1fr_1fr_1fr_1.4fr]">
+              <div className="mt-6 block lg:hidden">
+                <RiskGauge score={agent.riskScore} size="md" />
+              </div>
+              <div className="mt-6 grid gap-4 lg:grid-cols-4">
                 <div className="rounded-md bg-panel-strong p-4">
                   <p className="text-sm text-muted">AgentTrust</p>
                   <p className="mt-2 text-2xl font-black text-white">{agent.trustScore}</p>
                 </div>
                 <div className="rounded-md bg-panel-strong p-4">
-                  <RiskGauge score={agent.riskScore} />
+                  <p className="text-sm text-muted">Risk score</p>
+                  <p className="mt-2 text-2xl font-black text-white">{agent.riskScore}</p>
                 </div>
                 <div className="rounded-md bg-panel-strong p-4">
                   <p className="text-sm text-muted">Last seen</p>
