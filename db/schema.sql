@@ -106,10 +106,22 @@ create table if not exists tenant_integration_configs (
 create table if not exists report_snapshots (
   id text primary key,
   tenant_id text not null references tenants(id),
+  report_type text not null default 'custom',
   title text not null,
   summary text not null,
   source text not null,
   metrics jsonb not null,
+  sections jsonb not null default '[]'::jsonb,
+  created_at timestamptz not null default now()
+);
+
+create table if not exists report_definitions (
+  id text primary key,
+  title text not null,
+  category text not null,
+  cadence text not null,
+  description text not null,
+  sections jsonb not null,
   created_at timestamptz not null default now()
 );
 

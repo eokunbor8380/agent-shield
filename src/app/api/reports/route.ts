@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { requireSession } from "@/lib/auth";
+import { reportDefinitions } from "@/lib/reporting";
 import { readStore } from "@/lib/store";
 
 export async function GET() {
@@ -11,6 +12,7 @@ export async function GET() {
 
   return NextResponse.json({
     reports,
+    reportDefinitions,
     metrics: {
       agents: agents.length,
       highRiskAgents: agents.filter((agent) => agent.riskScore >= 70).length,

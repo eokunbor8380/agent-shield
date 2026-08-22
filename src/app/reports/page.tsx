@@ -2,6 +2,7 @@ import Link from "next/link";
 import { AppShell } from "@/components/AppShell";
 import { Panel } from "@/components/Panel";
 import { requireSession } from "@/lib/auth";
+import { reportDefinitions } from "@/lib/reporting";
 import { readStore } from "@/lib/store";
 
 export const metadata = {
@@ -44,6 +45,60 @@ export default async function ReportsPage() {
           <Panel title="Connector runs">
             <p className="text-4xl font-black text-white">{runs.length}</p>
             <p className="mt-2 text-sm text-muted">Data refreshes</p>
+          </Panel>
+        </div>
+
+        <div className="mt-8 grid gap-6 lg:grid-cols-[1fr_0.46fr]">
+          <Panel title="Report library">
+            <div className="grid gap-4">
+              {reportDefinitions.map((report) => (
+                <article key={report.id} className="rounded-md bg-panel-strong p-5">
+                  <div className="flex flex-wrap items-start justify-between gap-4">
+                    <div>
+                      <p className="text-xs font-black uppercase tracking-[0.14em] text-brand">{report.category} | {report.cadence}</p>
+                      <h2 className="mt-2 text-xl font-black text-white">{report.title}</h2>
+                    </div>
+                  </div>
+                  <p className="mt-3 leading-7 text-muted">{report.description}</p>
+                  <p className="mt-3 text-sm font-semibold text-muted">Includes: {report.sections.join(", ")}</p>
+                  <div className="mt-5 flex flex-wrap gap-3">
+                    {(["csv", "xls", "pdf"] as const).map((format) => (
+                      <Link
+                        key={`${report.id}-${format}`}
+                        href={`/api/reports/export?report=${report.id}&format=${format}`}
+                        className="rounded-md border border-line px-4 py-3 text-sm font-black uppercase text-white hover:border-brand"
+                      >
+                        Download {format === "xls" ? "Excel" : format}
+                      </Link>
+                    ))}
+                  </div>
+                </article>
+              ))}
+            </div>
+          </Panel>
+
+          <Panel title="Build custom report">
+            <form action="/api/reports/custom" method="post" className="grid gap-4">
+              <label className="grid gap-2">
+                <span className="text-sm font-bold text-white">Report title</span>
+                <input
+                  name="title"
+                  placeholder="Quarterly agent governance report"
+                  className="rounded-md border border-line bg-background px-4 py-3 text-white"
+                />
+              </label>
+              <div className="grid gap-3">
+                {["Agents", "High-risk agents", "Findings", "Policies", "Connector runs", "Compliance evidence", "Audit events"].map((section) => (
+                  <label key={section} className="flex items-center gap-3 rounded-md border border-line bg-panel-strong p-3 text-sm font-semibold text-muted">
+                    <input name="sections" value={section} type="checkbox" className="h-4 w-4 accent-brand" />
+                    {section}
+                  </label>
+                ))}
+              </div>
+              <button className="rounded-md bg-brand px-4 py-3 text-sm font-black text-slate-950 hover:bg-brand-strong" type="submit">
+                Create custom report
+              </button>
+            </form>
           </Panel>
         </div>
 
