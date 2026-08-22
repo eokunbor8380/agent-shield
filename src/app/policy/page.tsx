@@ -20,16 +20,32 @@ function PolicyCard({ policy, activeNames }: { policy: PolicyTemplate; activeNam
           {isActive ? "Active" : "Available"}
         </span>
       </div>
-      <p className="mt-4 min-h-24 leading-7 text-muted">{policy.rule}</p>
+      <div className="mt-4 grid gap-4 leading-7 text-muted">
+        <div>
+          <p className="text-sm font-black uppercase tracking-[0.12em] text-white">What it does</p>
+          <p className="mt-2">{policy.rule}</p>
+        </div>
+        <div>
+          <p className="text-sm font-black uppercase tracking-[0.12em] text-white">Why it matters</p>
+          <p className="mt-2">{policy.businessValue}</p>
+        </div>
+      </div>
       <div className="mt-5 grid gap-3 text-sm">
         <div className="rounded-md bg-panel-strong p-3">
-          <p className="font-bold text-white">Why customers use it</p>
-          <p className="mt-2 leading-6 text-muted">{policy.businessValue}</p>
+          <p className="font-bold text-white">How customers configure it</p>
+          <p className="mt-2 leading-6 text-muted">{policy.configuration.join(", ")}</p>
+        </div>
+        <div className="rounded-md bg-panel-strong p-3">
+          <p className="font-bold text-white">Evidence produced</p>
+          <p className="mt-2 leading-6 text-muted">{policy.evidence.join(", ")}</p>
         </div>
         <div className="grid gap-2 md:grid-cols-2">
           <p className="rounded-md border border-line p-3 font-semibold text-muted">Mode: {policy.enforcementMode}</p>
           <p className="rounded-md border border-line p-3 font-semibold text-muted">Risk: {policy.riskTier}</p>
         </div>
+        <p className="rounded-md border border-line p-3 font-semibold text-muted">
+          Frameworks: {policy.frameworks.join(", ")}
+        </p>
       </div>
       <div className="mt-5 flex flex-wrap gap-3">
         <form action="/api/policies" method="post">
@@ -104,8 +120,15 @@ export default async function PolicyPage() {
                   <div>
                     <p className="text-xs font-black uppercase tracking-[0.14em] text-brand">{policy.pack} | {policy.source}</p>
                     <h3 className="mt-2 text-xl font-black text-white">{policy.name}</h3>
-                    <p className="mt-3 leading-7 text-muted">{policy.rule}</p>
-                    <p className="mt-3 text-sm font-semibold text-muted">Evidence: {policy.evidence.join(", ") || "Decision trace"}</p>
+                    <div className="mt-4 grid gap-3 leading-7 text-muted">
+                      <p><span className="font-black text-white">What it does:</span> {policy.rule}</p>
+                      <p><span className="font-black text-white">Why it matters:</span> {policy.businessValue}</p>
+                    </div>
+                    <div className="mt-4 grid gap-2 text-sm font-semibold text-muted md:grid-cols-3">
+                      <p className="rounded-md border border-line p-3">Configure: {policy.configuration.join(", ") || "Tenant rules"}</p>
+                      <p className="rounded-md border border-line p-3">Evidence: {policy.evidence.join(", ") || "Decision trace"}</p>
+                      <p className="rounded-md border border-line p-3">Frameworks: {policy.frameworks.join(", ") || "Custom"}</p>
+                    </div>
                   </div>
                   <div className="grid gap-2 text-sm font-semibold text-muted">
                     <span className="rounded-md bg-panel-strong p-3">Mode: {policy.enforcementMode}</span>
