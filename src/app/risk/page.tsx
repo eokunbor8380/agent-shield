@@ -1,14 +1,19 @@
 import Link from "next/link";
 import { AppShell } from "@/components/AppShell";
-import { Panel } from "@/components/Panel";
 import { SectionIntro } from "@/components/SectionIntro";
 import { StatusPill } from "@/components/StatusPill";
 import { requireSession } from "@/lib/auth";
 import { readStore } from "@/lib/store";
 
+function detectedDate(index: number) {
+  const detectedDates = ["2026-08-21", "2026-08-20", "2026-08-16", "2026-08-12"];
+  return detectedDates[index] ?? "2026-08-10";
+}
+
 export default async function RiskPage() {
   await requireSession();
-  const { findings } = await readStore();
+  const store = await readStore();
+  const { findings } = store;
   const severityOrder = ["critical", "high", "medium", "low"];
   const groupedFindings = severityOrder.map((severity) => ({
     severity,
@@ -43,53 +48,54 @@ export default async function RiskPage() {
               </div>
 
               {group.findings.length ? (
-                <div className="grid gap-5">
-                  {group.findings.map((finding) => (
-                    <article key={finding.id} className="rounded-md border border-line bg-panel p-5">
-                      <div className="grid gap-5 lg:grid-cols-[150px_1fr_220px] lg:items-start">
-                        <StatusPill value={finding.severity} />
-                        <div>
-                          <p className="font-mono text-xs text-brand">{finding.id}</p>
-                          <h3 className="mt-1 text-xl font-black text-white">{finding.title}</h3>
-                          <p className="mt-2 text-sm font-semibold text-muted">{finding.entity}</p>
-                        </div>
-                        <div className="text-sm">
-                          <p className="font-bold text-white">{finding.owner}</p>
-                          <p className="text-muted">Due: {finding.due}</p>
-                          <p className="mt-2 font-semibold text-muted">{finding.status}</p>
-                        </div>
-                      </div>
+                <div className="overflow-x-auto rounded-md border border-line bg-panel">
+                  <table className="min-w-[1180px] w-full border-collapse text-left text-sm">
+                    <thead className="bg-panel-strong text-xs font-black uppercase tracking-[0.12em] text-muted">
+                      <tr>
+                        <th className="px-4 py-3">Severity</th>
+                        <th className="px-4 py-3">Risk ID</th>
+                        <th className="px-4 py-3">Agent / entity</th>
+                        <th className="px-4 py-3">Risk title</th>
+                        <th className="px-4 py-3">Status</th>
+                        <th className="px-4 py-3">Owner</th>
+                        <th className="px-4 py-3">Detected</th>
+                        <th className="px-4 py-3">Last seen</th>
+                        <th className="px-4 py-3">Due</th>
+                        <th className="px-4 py-3">Impact</th>
+                        <th className="px-4 py-3">Recommended fix</th>
+                        <th className="px-4 py-3">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {group.findings.map((finding, index) => {
+                        const agent = finding.entityId ? store.agents.find((item) => item.id === finding.entityId) : null;
 
-                      <div className="mt-5 grid gap-4 lg:grid-cols-3">
-                        <Panel title="Risk metadata">
-                          <div className="grid gap-2 text-sm font-semibold text-muted">
-                            <p>Entity: <span className="text-white">{finding.entity}</span></p>
-                            <p>Status: <span className="text-white">{finding.status}</span></p>
-                            <p>Owner: <span className="text-white">{finding.owner}</span></p>
-                            <p>Due: <span className="text-white">{finding.due}</span></p>
-                          </div>
-                        </Panel>
-                        <Panel title="Impact and evidence">
-                          <p className="text-sm leading-6 text-muted">{finding.impact}</p>
-                          <ul className="mt-4 grid gap-2 text-sm font-semibold text-muted">
-                            {finding.evidence.map((item) => (
-                              <li key={item} className="rounded-md bg-panel-strong px-3 py-2">{item}</li>
-                            ))}
-                          </ul>
-                        </Panel>
-                        <Panel title="Recommended fix">
-                          <ul className="grid gap-2 text-sm font-semibold text-muted">
-                            {finding.remediation.map((item) => (
-                              <li key={item} className="rounded-md bg-panel-strong px-3 py-2">{item}</li>
-                            ))}
-                          </ul>
-                          <Link href={`/risk/${finding.id}`} className="mt-5 inline-flex rounded-md border border-line px-4 py-3 text-sm font-black text-white hover:border-brand">
-                            Open full finding
-                          </Link>
-                        </Panel>
-                      </div>
-                    </article>
-                  ))}
+                        return (
+                          <tr key={finding.id} className="border-t border-line align-top">
+                            <td className="px-4 py-4"><StatusPill value={finding.severity} /></td>
+                            <td className="px-4 py-4 font-mono text-xs text-brand">{finding.id}</td>
+                            <td className="px-4 py-4">
+                              <p className="font-bold text-white">{finding.entity}</p>
+                              <p className="mt-1 text-xs text-muted">{agent ? agent.type : "External identity"}</p>
+                            </td>
+                            <td className="px-4 py-4 font-bold text-white">{finding.title}</td>
+                            <td className="px-4 py-4 font-semibold text-muted">{finding.status}</td>
+                            <td className="px-4 py-4 font-semibold text-white">{finding.owner}</td>
+                            <td className="px-4 py-4 text-muted">{detectedDate(index)}</td>
+                            <td className="px-4 py-4 text-muted">{agent?.lastSeen ?? "Unknown"}</td>
+                            <td className="px-4 py-4 text-muted">{finding.due}</td>
+                            <td className="max-w-[260px] px-4 py-4 leading-6 text-muted">{finding.impact}</td>
+                            <td className="max-w-[260px] px-4 py-4 leading-6 text-muted">{finding.remediation[0]}</td>
+                            <td className="px-4 py-4">
+                              <Link href={`/risk/${finding.id}`} className="whitespace-nowrap rounded-md border border-line px-3 py-2 text-xs font-black text-white hover:border-brand">
+                                Open
+                              </Link>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
                 </div>
               ) : (
                 <div className="rounded-md border border-line bg-panel p-5">
