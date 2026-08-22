@@ -21,8 +21,8 @@ export async function AppShell({ children }: { children: React.ReactNode }) {
   const session = await getSession();
 
   return (
-    <main className="min-h-screen bg-background text-foreground">
-      <header className="border-b border-line bg-background/95">
+    <main className="app-background min-h-screen text-foreground">
+      <header className="border-b border-line bg-background/85 backdrop-blur">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-6 px-6 py-5">
           <BrandLogo />
           <nav className="hidden items-center gap-6 text-sm font-semibold text-muted lg:flex" aria-label="Main navigation">
@@ -54,7 +54,7 @@ export async function AppShell({ children }: { children: React.ReactNode }) {
         </div>
       </header>
       {children}
-      <footer className="border-t border-line bg-background">
+      <footer className="border-t border-line bg-background/85 backdrop-blur">
         <div className="mx-auto flex max-w-7xl flex-col gap-3 px-6 py-8 text-sm text-muted md:flex-row md:items-center md:justify-between">
           <p>AgentShield protects autonomous identities, policy decisions, and evidence trails.</p>
           <div className="flex flex-wrap gap-4 font-semibold">
