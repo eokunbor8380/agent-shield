@@ -10,15 +10,18 @@ function detectedDate(index: number) {
   return detectedDates[index] ?? "2026-08-10";
 }
 
-export default async function RiskPage() {
+export default async function RiskPage({ searchParams }: PageProps<"/risk">) {
   await requireSession();
+  const params = await searchParams;
   const store = await readStore();
   const { findings } = store;
   const severityOrder = ["critical", "high", "medium", "low"];
+  const selectedSeverity = severityOrder.includes(String(params.severity)) ? String(params.severity) : null;
   const groupedFindings = severityOrder.map((severity) => ({
     severity,
     findings: findings.filter((finding) => finding.severity === severity),
   }));
+  const selectedGroup = groupedFindings.find((group) => group.severity === selectedSeverity) ?? null;
 
   return (
     <AppShell>
@@ -31,23 +34,27 @@ export default async function RiskPage() {
 
         <div className="mt-10 grid gap-4 md:grid-cols-4">
           {groupedFindings.map((group) => (
-            <a key={group.severity} href={`#${group.severity}-risks`} className="rounded-md border border-line bg-panel p-5 hover:border-brand hover:bg-panel-strong">
+            <Link
+              key={group.severity}
+              href={`/risk?severity=${group.severity}`}
+              className={`rounded-md border p-5 hover:border-brand hover:bg-panel-strong ${selectedSeverity === group.severity ? "border-brand bg-panel-strong" : "border-line bg-panel"}`}
+            >
               <StatusPill value={group.severity} />
               <p className="mt-5 text-4xl font-black text-white">{group.findings.length}</p>
               <p className="mt-2 text-sm font-semibold text-muted">View {group.severity} findings</p>
-            </a>
+            </Link>
           ))}
         </div>
 
         <div className="mt-10 grid gap-8">
-          {groupedFindings.map((group) => (
-            <section key={group.severity} id={`${group.severity}-risks`} className="scroll-mt-28">
+          {selectedGroup ? (
+            <section id={`${selectedGroup.severity}-risks`} className="scroll-mt-28">
               <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-                <h2 className="text-2xl font-black capitalize text-white">{group.severity} risks</h2>
-                <p className="text-sm font-semibold text-muted">{group.findings.length} finding(s)</p>
+                <h2 className="text-2xl font-black capitalize text-white">{selectedGroup.severity} risks</h2>
+                <p className="text-sm font-semibold text-muted">{selectedGroup.findings.length} finding(s)</p>
               </div>
 
-              {group.findings.length ? (
+              {selectedGroup.findings.length ? (
                 <div className="overflow-x-auto rounded-md border border-line bg-panel">
                   <table className="min-w-[1240px] w-full border-collapse text-left text-xs">
                     <thead className="bg-panel-strong text-[10px] font-black uppercase tracking-[0.12em] text-muted">
@@ -67,7 +74,7 @@ export default async function RiskPage() {
                       </tr>
                     </thead>
                     <tbody>
-                      {group.findings.map((finding, index) => {
+                      {selectedGroup.findings.map((finding, index) => {
                         const agent = finding.entityId ? store.agents.find((item) => item.id === finding.entityId) : null;
 
                         return (
@@ -99,12 +106,19 @@ export default async function RiskPage() {
                 </div>
               ) : (
                 <div className="rounded-md border border-line bg-panel p-5">
-                  <p className="font-bold text-white">No {group.severity} risks identified.</p>
+                  <p className="font-bold text-white">No {selectedGroup.severity} risks identified.</p>
                   <p className="mt-2 text-sm leading-6 text-muted">Connector sync and policy evaluation will populate this section when matching findings appear.</p>
                 </div>
               )}
             </section>
-          ))}
+          ) : (
+            <div className="rounded-md border border-line bg-panel p-6">
+              <p className="text-xl font-black text-white">Select a risk category to view metadata.</p>
+              <p className="mt-3 max-w-3xl text-sm leading-6 text-muted">
+                Click Critical, High, Medium, or Low above to open the matching risk table with agent metadata, status, owner, detected date, last seen, impact, and recommended fix.
+              </p>
+            </div>
+          )}
         </div>
       </section>
     </AppShell>
