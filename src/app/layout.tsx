@@ -15,6 +15,11 @@ export const metadata: Metadata = {
   keywords: ["AI agent security", "non-human identity", "agent governance", "runtime authorization", "cyber risk"],
   authors: [{ name: "AgentShield" }],
   creator: "AgentShield",
+  icons: {
+    icon: "/agent-shield-logo.svg",
+    shortcut: "/agent-shield-logo.svg",
+    apple: "/agent-shield-logo.svg",
+  },
   openGraph: {
     title: "AgentShield | AI Agent Security Control Plane",
     description: "Discover, govern, score, and protect enterprise AI agents and non-human identities.",

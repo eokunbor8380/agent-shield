@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-labelledby="title desc">
+  <title id="title">AgentShield logo</title>
+  <desc id="desc">A shield containing a stylized agent A and an evidence signal point.</desc>
+  <rect width="256" height="256" rx="52" fill="#07111f"/>
+  <defs>
+    <linearGradient id="mark" x1="46" y1="28" x2="210" y2="230" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#7cf7dc"/>
+      <stop offset="0.48" stop-color="#4fd1c5"/>
+      <stop offset="1" stop-color="#8b5cf6"/>
+    </linearGradient>
+  </defs>
+  <path d="M128 21 214 56v64c0 59-34 98-86 116-52-18-86-57-86-116V56l86-35Z" fill="#0d1b2f" stroke="url(#mark)" stroke-width="12"/>
+  <path d="M85 166 128 67l43 99h-24l-8-21h-22l-8 21H85Zm40-42h16l-8-21-8 21Z" fill="#e5edf8"/>
+  <path d="M74 186h108" stroke="#5eead4" stroke-width="12" stroke-linecap="round"/>
+  <circle cx="196" cy="79" r="13" fill="#fbbf24"/>
+</svg>

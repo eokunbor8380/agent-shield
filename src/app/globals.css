@@ -37,3 +37,25 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+.agent-grid-background {
+  background:
+    linear-gradient(115deg, rgba(7, 17, 31, 0.92), rgba(7, 17, 31, 0.68) 48%, rgba(8, 13, 27, 0.94)),
+    linear-gradient(150deg, rgba(94, 234, 212, 0.16), transparent 34%, rgba(139, 92, 246, 0.1) 68%, transparent),
+    linear-gradient(35deg, transparent 12%, rgba(251, 191, 36, 0.08) 38%, transparent 58%),
+    linear-gradient(rgba(94, 234, 212, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(94, 234, 212, 0.08) 1px, transparent 1px),
+    #07111f;
+  background-size: auto, auto, auto, 72px 72px, 72px 72px, auto;
+}
+
+.agent-signal-panel {
+  background:
+    linear-gradient(135deg, rgba(16, 36, 63, 0.95), rgba(8, 19, 34, 0.96)),
+    repeating-linear-gradient(90deg, rgba(94, 234, 212, 0.08) 0 1px, transparent 1px 42px);
+}
+
+.agent-orbit-line {
+  border: 1px solid rgba(94, 234, 212, 0.2);
+  box-shadow: inset 0 0 36px rgba(94, 234, 212, 0.04), 0 0 42px rgba(94, 234, 212, 0.08);
+}
