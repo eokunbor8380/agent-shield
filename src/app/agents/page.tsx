@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { AppShell } from "@/components/AppShell";
 import { Panel } from "@/components/Panel";
+import { RiskGauge } from "@/components/RiskGauge";
 import { SectionIntro } from "@/components/SectionIntro";
 import { StatusPill } from "@/components/StatusPill";
 import { requireSession } from "@/lib/auth";
@@ -38,20 +39,19 @@ export default async function AgentsPage() {
                   </Link>
                 </div>
               </div>
-              <div className="mt-6 grid gap-4 md:grid-cols-4">
+              <div className="mt-6 grid gap-4 lg:grid-cols-[1fr_1fr_1fr_1.4fr]">
                 <div className="rounded-md bg-panel-strong p-4">
                   <p className="text-sm text-muted">AgentTrust</p>
                   <p className="mt-2 text-2xl font-black text-white">{agent.trustScore}</p>
                 </div>
                 <div className="rounded-md bg-panel-strong p-4">
-                  <p className="text-sm text-muted">Risk score</p>
-                  <p className="mt-2 text-2xl font-black text-white">{agent.riskScore}</p>
+                  <RiskGauge score={agent.riskScore} />
                 </div>
                 <div className="rounded-md bg-panel-strong p-4">
                   <p className="text-sm text-muted">Last seen</p>
                   <p className="mt-2 text-lg font-black text-white">{agent.lastSeen}</p>
                 </div>
-                <div className="rounded-md bg-panel-strong p-4 md:col-span-2">
+                <div className="rounded-md bg-panel-strong p-4">
                   <p className="text-sm text-muted">Tools and data reach</p>
                   <p className="mt-2 font-semibold text-white">{agent.tools.join(", ")}</p>
                   <p className="mt-1 text-sm text-muted">{agent.data}</p>

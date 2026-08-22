@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { AppShell } from "@/components/AppShell";
 import { MetricCard } from "@/components/MetricCard";
 import { Panel } from "@/components/Panel";
+import { RiskGauge } from "@/components/RiskGauge";
 import { StatusPill } from "@/components/StatusPill";
 import { agents } from "@/data/agentShield";
 import { requireSession } from "@/lib/auth";
@@ -80,9 +81,11 @@ export default async function AgentPassportPage({ params }: PageProps<"/agents/[
           </Panel>
         </div>
 
-        <div className="mt-10 grid gap-4 md:grid-cols-3">
+        <div className="mt-10 grid gap-4 lg:grid-cols-[1.1fr_0.9fr_0.9fr]">
+          <Panel title="Risk posture">
+            <RiskGauge score={agent.riskScore} size="lg" />
+          </Panel>
           <MetricCard label="AgentTrust" value={String(agent.trustScore)} delta="Explainable trust score" />
-          <MetricCard label="Risk score" value={String(agent.riskScore)} delta="Current exposure level" />
           <MetricCard label="Engine score" value={String(engineScore.score)} delta={`${engineScore.band} risk band`} />
         </div>
 
